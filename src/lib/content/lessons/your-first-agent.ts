@@ -89,6 +89,7 @@ export const yourFirstAgent: Lesson = {
   title: "Your first agent",
   summary:
     "Build a stateful agent that calls a model and remembers how many times it has run — using the Agents SDK on a Durable Object.",
+  bigIdea: "An agent is a **durable** identity that calls a model and remembers — across requests.",
 
   outcomes: [
     "Explain how an Agent differs from a plain Worker and a chatbot.",
@@ -114,15 +115,26 @@ export const yourFirstAgent: Lesson = {
   ],
 
   blocks: [
-    { kind: "heading", text: "What is an agent, really?", id: "what" },
+    { kind: "heading", text: "Worker vs. agent", id: "what" },
     {
       kind: "prose",
-      text: "An *agent* is software that can **remember**, **decide**, and **act** toward a goal — not just answer one question. A plain chatbot replies and forgets. An agent keeps context, calls models and tools, and can pick up where it left off.",
+      text: "A plain Worker forgets between requests. An agent keeps its own memory — and can call models and tools toward a goal.",
     },
+    {
+      kind: "compare",
+      left: {
+        title: "Plain Worker",
+        items: ["Stateless — forgets each request", "Just request → response"],
+      },
+      right: {
+        title: "Agent",
+        items: ["Durable identity + memory", "Calls models and tools", "Resumes across requests", "Can run on a schedule"],
+      },
+    },
+    { kind: "statement", text: "Every agent: **input → think → remember → respond**.", sub: "a model for thinking, durable state for memory" },
     {
       kind: "diagram",
       title: "The shape of every agent",
-      caption: "The agent prompts a model and persists what it learns to memory.",
       nodes: [
         { id: "you", label: "You / system", tone: "user", icon: "person", x: 0, y: 80 },
         { id: "agent", label: "Agent", tone: "agent", icon: "agent", x: 240, y: 80 },
@@ -139,19 +151,7 @@ export const yourFirstAgent: Lesson = {
       kind: "analogy",
       role: "Data analyst",
       audience: "concept",
-      text: "Think of a saved spreadsheet macro that also *remembers* every run and can ask an AI for help mid-way — it keeps its own running totals between uses, without a separate database.",
-    },
-    {
-      kind: "analogy",
-      role: "Finance",
-      audience: "concept",
-      text: "Like a recurring reconciliation that retains its own ledger of what it has processed, can call out for a judgment call, and resumes cleanly next month.",
-    },
-    {
-      kind: "callout",
-      tone: "note",
-      title: "The one idea to keep",
-      text: "One agent = one durable identity with its own private memory. You talk to it by name, and it's still there — with its memory — on the next request. No external database required.",
+      text: "Like a saved spreadsheet macro that remembers every run and can ask an AI for help mid-way — keeping its own running totals, no separate database.",
     },
 
     // ── Concept-only walkthrough (no code) ──
@@ -167,20 +167,15 @@ export const yourFirstAgent: Lesson = {
       ],
     },
     {
-      kind: "prose",
-      audience: "concept",
-      text: "That's the whole pattern: **input → think (model) → remember (state) → respond**.",
-    },
-    {
       kind: "watch",
       labId: "greeter",
       audience: "concept",
-      caption: "No code needed — run the finished agent and watch it greet someone (and count the greeting).",
+      caption: "No code needed — run the finished agent and watch it greet someone (and count it).",
     },
     {
       kind: "prose",
       audience: "concept",
-      text: "Switch to **Code** view (top right) anytime to see — and build — the real implementation.",
+      text: "Switch to **Code** to see — and build — the real implementation.",
     },
 
     // ── Code view ──
@@ -188,14 +183,14 @@ export const yourFirstAgent: Lesson = {
     {
       kind: "prose",
       audience: "code",
-      text: "You extend `Agent<Env, State>` and implement a handler such as `onRequest`. Inside, `this.env` exposes your **bindings** (like `AI`), and `this.state` / `this.setState` persist data automatically.",
+      text: "Extend `Agent<Env, State>` and implement `onRequest`. `this.env` holds your bindings (like `AI`); `this.state` / `this.setState` persist automatically.",
     },
     {
       kind: "callout",
       tone: "note",
       audience: "code",
-      title: "New words (in plain English)",
-      text: "**Durable Object** — a single, always-there copy of your agent with its own tiny built-in database. That's what makes its memory durable. **`<Env, State>`** — you're just telling TypeScript the shape of your bindings (`Env`) and your saved data (`State`). **Binding** — a ready-to-use connection to a resource (like the AI model) that shows up on `this.env`. You don't need to memorize these — they'll feel natural after one or two lessons.",
+      title: "New words, in plain English",
+      text: "**Durable Object** — a single always-there copy of your agent with its own tiny built-in database (that's what makes memory durable). **Binding** — a ready-to-use connection to a resource (like the AI model) on `this.env`. No need to memorize — these click after a lesson or two.",
     },
     {
       kind: "code",
@@ -208,7 +203,7 @@ export const yourFirstAgent: Lesson = {
     {
       kind: "prose",
       audience: "code",
-      text: "Below is a real agent with three TODOs. Implement them so it greets a person with a model-generated line and counts how many greetings it has produced. Press **Run** to execute, then **Check** to grade against the lesson's hidden tests.",
+      text: "This agent has three TODOs. Make it greet a name with a model-generated line and count its greetings. Press **Run**, then **Check**.",
     },
     { kind: "codelab", labId: "greeter", audience: "code" },
     {
