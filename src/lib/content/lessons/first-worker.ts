@@ -65,6 +65,7 @@ export const firstWorker: Lesson = {
   title: "Your first Worker",
   summary:
     "Meet the unit of compute every agent runs on: a Worker. Write a fetch handler, add a binding, and deploy it live — with Wrangler.",
+  bigIdea: "A Worker is one function that turns a request into a response — with **no servers** to manage.",
 
   outcomes: [
     "Explain what a Worker is and where it runs.",
@@ -93,12 +94,11 @@ export const firstWorker: Lesson = {
     { kind: "heading", text: "What is a Worker?", id: "what" },
     {
       kind: "prose",
-      text: "A **Worker** is a small piece of code that runs on Cloudflare's network — at the location nearest each user — without you managing any servers. A request comes in, your **`fetch` handler** runs, and you return a **`Response`**. That's the whole model. An **agent** is just a Worker with durable memory, so this is the shape everything else builds on.",
+      text: "Code that runs on Cloudflare's network, near each user — no servers to manage. A request comes in, your `fetch` handler runs, and you return a `Response`.",
     },
     {
       kind: "diagram",
       title: "Request → Worker → Response",
-      caption: "A Worker may call a binding (like env.AI) before it returns its response.",
       nodes: [
         { id: "req", label: "Request", tone: "user", icon: "globe", x: 0, y: 80 },
         { id: "worker", label: "Worker (fetch)", tone: "agent", icon: "code", x: 240, y: 80 },
@@ -111,47 +111,28 @@ export const firstWorker: Lesson = {
         { from: "worker", to: "binding", label: "env.AI" },
       ],
     },
+    { kind: "statement", text: "An agent is just a Worker with **memory**.", sub: "Same request → handler → response — plus durable state." },
+    {
+      kind: "pills",
+      label: "On env, a Worker reaches:",
+      items: ["Workers AI", "KV", "R2", "Durable Objects", "Queues"],
+    },
     {
       kind: "analogy",
       role: "Data analyst",
       audience: "concept",
-      text: "Think of a cloud function behind a URL: you don't run a machine, you just write 'when someone asks, do this and reply'. Cloudflare keeps it available everywhere, instantly.",
-    },
-    {
-      kind: "analogy",
-      role: "Data engineer",
-      audience: "concept",
-      text: "Like a stateless HTTP service with zero infra to manage — deploy is a single command, it scales to zero, and 'bindings' replace the usual tangle of connection strings and SDK setup.",
-    },
-    {
-      kind: "callout",
-      tone: "note",
-      title: "The one idea to keep",
-      text: "A Worker = one function (`fetch`) that turns a request into a response, running everywhere with no servers to manage. Bindings on `env` connect it to AI, storage, and other agents.",
-    },
-
-    // ── Concept-only summary ──
-    {
-      kind: "list",
-      audience: "concept",
-      ordered: true,
-      items: [
-        "A request arrives (someone opens your URL or your app calls it).",
-        "Your `fetch` handler runs at the nearest Cloudflare location.",
-        "It can use bindings — like the AI model — to do real work.",
-        "It returns a response. Deploy is one command: `wrangler deploy`.",
-      ],
+      text: "Like a cloud function behind a URL: no machine to run — you just say “when someone asks, do this and reply,” and it's available everywhere.",
     },
     {
       kind: "watch",
       labId: "hello-worker",
       audience: "concept",
-      caption: "No code needed — run the finished Worker and see the response it returns.",
+      caption: "No code needed — run the finished Worker and see what it returns.",
     },
     {
       kind: "prose",
       audience: "concept",
-      text: "That's the platform your agents live on. Switch to **Code** view to write and run one yourself.",
+      text: "That's the platform your agents live on. Switch to **Code** to write one yourself.",
     },
 
     // ── Code view ──
@@ -159,7 +140,7 @@ export const firstWorker: Lesson = {
     {
       kind: "prose",
       audience: "code",
-      text: "You scaffold a project with `npm create cloudflare@latest` (the C3 CLI). It gives you a `wrangler.jsonc` config and a `src/index.js` with a default export. The `fetch` handler receives `(request, env, ctx)` and returns a `Response`.",
+      text: "Scaffold with `npm create cloudflare@latest`. You get a `wrangler.jsonc` and a `fetch` handler that takes `(request, env, ctx)` and returns a `Response`.",
     },
     {
       kind: "code",
@@ -180,7 +161,7 @@ export const firstWorker: Lesson = {
     {
       kind: "prose",
       audience: "code",
-      text: "Bindings are how a Worker reaches platform resources. Declare one in config and it appears on `env`. Add the **AI** binding and your Worker can call a model directly — the seed of an agent.",
+      text: "Declare a binding in config and it appears on `env`. Add the **AI** binding and your Worker can call a model — the seed of an agent.",
     },
     {
       kind: "code",
@@ -201,7 +182,7 @@ export const firstWorker: Lesson = {
     {
       kind: "prose",
       audience: "code",
-      text: "Here's a real Worker. Make it greet a person by name from the URL — `/?name=Ada` should return `Hello, Ada!`, and default to `world` when no name is given. Press **Run**, then **Check**.",
+      text: "Make this Worker greet by name: `/?name=Ada` → `Hello, Ada!`, default to `world`. Press **Run**, then **Check**.",
     },
     { kind: "codelab", labId: "hello-worker", audience: "code" },
     {

@@ -47,12 +47,22 @@ export interface ComparePane {
   items: string[];
 }
 
+/** One big-number stat in a `stat` block. */
+export interface StatItem {
+  value: string;
+  label: string;
+  /** Colour token for the value. Defaults to the accent colour. */
+  tone?: "accent" | "ai" | "compute" | "media" | "foreground";
+}
+
 /** A unit of lesson body. Rendered by the article page block-by-block. */
 export type Block = ({ audience?: Audience }) & (
   | { kind: "prose"; text: string }
   | { kind: "heading"; text: string; id?: string }
   | { kind: "statement"; text: string; sub?: string } // big one-idea headline; **word** renders in the accent colour
   | { kind: "compare"; left: ComparePane; right: ComparePane } // two-column ×/✓ contrast
+  | { kind: "stat"; items: StatItem[] } // a row of big-number payoff stats
+  | { kind: "pills"; label?: string; items: string[] } // a row of keyword/capability chips
   | { kind: "code"; lang: string; code: string; caption?: string }
   | { kind: "callout"; tone: "note" | "tip" | "warning"; title?: string; text: string }
   | { kind: "list"; ordered?: boolean; items: string[] }

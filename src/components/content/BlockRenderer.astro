@@ -25,6 +25,14 @@ const calloutTone: Record<string, string> = {
   tip: "border-ai-100 bg-ai-200",
   warning: "border-security-100 bg-security-100/5",
 };
+
+const statTone: Record<string, string> = {
+  accent: "text-accent-muted",
+  ai: "text-ai-100",
+  compute: "text-compute-100",
+  media: "text-media-100",
+  foreground: "text-foreground-100",
+};
 ---
 
 <div
@@ -69,6 +77,24 @@ const calloutTone: Record<string, string> = {
     <ul class={`mt-4 space-y-1.5 pl-5 text-foreground-200 ${b.ordered ? "list-decimal" : "list-disc"}`}>
       {b.items.map((it) => <li set:html={inline(it)} />)}
     </ul>
+  )}
+  {b.kind === "stat" && (
+    <div class={`my-8 grid gap-4 text-center ${b.items.length >= 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+      {b.items.map((s) => (
+        <div class="rounded-xl border border-border-100 bg-background-content px-4 py-6">
+          <p class={`font-mono text-4xl leading-none md:text-5xl ${statTone[s.tone ?? "accent"]}`}>{s.value}</p>
+          <p class="mt-2 text-sm text-foreground-200">{s.label}</p>
+        </div>
+      ))}
+    </div>
+  )}
+  {b.kind === "pills" && (
+    <div class="my-6 flex flex-wrap items-center gap-2">
+      {b.label && <span class="mr-1 text-sm text-foreground-200">{b.label}</span>}
+      {b.items.map((it) => (
+        <span class="rounded-full border border-ai-100/40 bg-ai-100/5 px-3 py-1 font-mono text-xs text-ai-100">{it}</span>
+      ))}
+    </div>
   )}
   {b.kind === "callout" && (
     <div class={`mt-5 rounded-lg border-l-2 px-4 py-3 ${calloutTone[b.tone]}`}>

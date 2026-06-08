@@ -41,6 +41,13 @@ async function lintLesson(l: Lesson) {
     if (b.kind === "streamChat" && !l.streamChats?.[b.chatId]) fail(l.slug, `streamChat references missing streamChat '${b.chatId}'`);
     if (b.kind === "quiz" && !l.quizzes[b.quizId]) fail(l.slug, `quiz references missing quiz '${b.quizId}'`);
     if (b.kind === "statement" && !b.text.trim()) fail(l.slug, "statement block has empty text");
+    if (b.kind === "stat") {
+      if (b.items.length < 1) fail(l.slug, "stat block needs ≥1 item");
+      for (const s of b.items) {
+        if (!s.value.trim() || !s.label.trim()) fail(l.slug, "stat item needs a value and a label");
+      }
+    }
+    if (b.kind === "pills" && b.items.length < 1) fail(l.slug, "pills block needs ≥1 item");
     if (b.kind === "compare") {
       for (const side of ["left", "right"] as const) {
         const pane = b[side];
