@@ -68,6 +68,23 @@ export function getRoleById(id: string | null | undefined): Role | undefined {
   return ROLES.find((r) => r.id === id);
 }
 
+/**
+ * Map a human role label used in content (e.g. "Data analyst", "Finance",
+ * "Data scientist") to a canonical role id. Tolerant: exact id, exact label,
+ * then a loose first-word match ("Finance" -> "Finance specialist").
+ */
+export function roleIdFromLabel(label: string): string | undefined {
+  const s = label.trim().toLowerCase();
+  const byId = ROLES.find((r) => r.id === s);
+  if (byId) return byId.id;
+  const byLabel = ROLES.find((r) => r.label.toLowerCase() === s);
+  if (byLabel) return byLabel.id;
+  const loose = ROLES.find(
+    (r) => r.label.toLowerCase().startsWith(s) || s.startsWith(r.label.toLowerCase().split(" ")[0]),
+  );
+  return loose?.id;
+}
+
 /** Read the saved role on the client (safe in SSR — returns undefined). */
 export function readRole(): Role | undefined {
   if (typeof localStorage === "undefined") return undefined;

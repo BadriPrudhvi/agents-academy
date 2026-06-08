@@ -36,39 +36,10 @@ async function lintLesson(l: Lesson) {
   for (const b of l.blocks) {
     if (b.kind === "codelab" && !l.labs[b.labId]) fail(l.slug, `codelab references missing lab '${b.labId}'`);
     if (b.kind === "watch" && !l.labs[b.labId]) fail(l.slug, `watch references missing lab '${b.labId}'`);
-    if (b.kind === "agentSim" && !l.sims?.[b.simId]) fail(l.slug, `agentSim references missing sim '${b.simId}'`);
-    if (b.kind === "agentBuilder" && !l.builders?.[b.builderId]) fail(l.slug, `agentBuilder references missing builder '${b.builderId}'`);
     if (b.kind === "agentStudio" && !l.studios?.[b.studioId]) fail(l.slug, `agentStudio references missing studio '${b.studioId}'`);
     if (b.kind === "agentRun" && !l.agentRuns?.[b.runId]) fail(l.slug, `agentRun references missing agentRun '${b.runId}'`);
+    if (b.kind === "streamChat" && !l.streamChats?.[b.chatId]) fail(l.slug, `streamChat references missing streamChat '${b.chatId}'`);
     if (b.kind === "quiz" && !l.quizzes[b.quizId]) fail(l.slug, `quiz references missing quiz '${b.quizId}'`);
-  }
-
-  // ── AgentSim integrity (no-code interactive) ──
-  for (const sim of Object.values(l.sims ?? {})) {
-    if (!sim.toolName.trim()) fail(l.slug, `sim '${sim.id}' missing toolName`);
-    if (sim.toolPreview.columns.length < 1 || sim.toolPreview.rows.length < 1) {
-      fail(l.slug, `sim '${sim.id}' needs a visible toolPreview table`);
-    }
-    if (sim.goals.length < 1) fail(l.slug, `sim '${sim.id}' needs at least one goal`);
-    for (const goal of sim.goals) {
-      if (!goal.program.trim()) fail(l.slug, `sim '${sim.id}' goal '${goal.id}' missing server-side program`);
-      if (!goal.expectedAnswer.trim()) fail(l.slug, `sim '${sim.id}' goal '${goal.id}' missing expectedAnswer`);
-      if (goal.steps.length < 3) fail(l.slug, `sim '${sim.id}' goal '${goal.id}' needs at least 3 steps`);
-      if (!goal.chatbotGuess.trim()) fail(l.slug, `sim '${sim.id}' goal '${goal.id}' missing chatbotGuess`);
-    }
-  }
-
-  // ── AgentBuilder integrity (no-code-to-code bridge) ──
-  for (const builder of Object.values(l.builders ?? {})) {
-    if (!builder.title.trim()) fail(l.slug, `builder '${builder.id}' missing title`);
-    if (!builder.intro.trim()) fail(l.slug, `builder '${builder.id}' missing intro`);
-    if (builder.steps.length < 4) fail(l.slug, `builder '${builder.id}' needs at least 4 steps`);
-    for (const step of builder.steps) {
-      if (!step.label.trim()) fail(l.slug, `builder '${builder.id}' step '${step.id}' missing label`);
-      if (!step.plain.trim()) fail(l.slug, `builder '${builder.id}' step '${step.id}' missing plain-language explanation`);
-      if (!step.code.trim()) fail(l.slug, `builder '${builder.id}' step '${step.id}' missing code`);
-      if (!step.output.trim()) fail(l.slug, `builder '${builder.id}' step '${step.id}' missing run output`);
-    }
   }
 
   // ── AgentStudio integrity (unified build + run interactive) ──
@@ -92,6 +63,14 @@ async function lintLesson(l: Lesson) {
     if (!run.model.trim()) fail(l.slug, `agentRun '${run.id}' missing model`);
     if (run.tools.length < 1) fail(l.slug, `agentRun '${run.id}' needs at least one tool`);
     if (run.examples.length < 1) fail(l.slug, `agentRun '${run.id}' needs at least one example goal`);
+  }
+
+  // ── StreamChat integrity (live token-streaming chat) ──
+  for (const c of Object.values(l.streamChats ?? {})) {
+    if (!c.intro.trim()) fail(l.slug, `streamChat '${c.id}' missing intro`);
+    if (!c.modelId.trim()) fail(l.slug, `streamChat '${c.id}' missing modelId`);
+    if (!c.system.trim()) fail(l.slug, `streamChat '${c.id}' missing system prompt`);
+    if (c.examples.length < 1) fail(l.slug, `streamChat '${c.id}' needs at least one example`);
   }
 
   // ── Quiz integrity ──

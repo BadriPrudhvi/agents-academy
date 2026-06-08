@@ -117,6 +117,12 @@ export const firstDataAgent: Lesson = {
       ],
     },
     {
+      kind: "watch",
+      labId: "python-summary",
+      audience: "concept",
+      caption: "No code needed — run the finished analysis and see the real numbers the Sandbox computes.",
+    },
+    {
       kind: "prose",
       audience: "concept",
       text: "Switch to **Code** view to write the Python — or just read it; it's four lines of analysis.",
@@ -139,6 +145,7 @@ export const firstDataAgent: Lesson = {
 
     { kind: "heading", text: "Check your understanding", id: "check" },
     { kind: "quiz", quizId: "why-sandbox" },
+    { kind: "quiz", quizId: "where-python-runs" },
   ],
 
   labs: {
@@ -185,6 +192,19 @@ export const firstDataAgent: Lesson = {
       explanation:
         "Models approximate arithmetic. A Sandbox runs actual Python so the figures are computed from the source data and can be reproduced — essential for analysis and finance.",
     },
+    "where-python-runs": {
+      id: "where-python-runs",
+      question: "Where does the agent's Python actually run?",
+      options: [
+        "On your laptop, with access to your files",
+        "Inside the language model itself",
+        "In an isolated Sandbox container — not your machine or the Worker — with limits and no secret access",
+        "On the user's phone",
+      ],
+      answerIndex: 2,
+      explanation:
+        "The code runs in an isolated Sandbox container with resource limits and no access to your secrets — so model-written Python can compute on data without touching your machine, the Worker, or anything sensitive.",
+    },
   },
 
   recap: [
@@ -192,7 +212,7 @@ export const firstDataAgent: Lesson = {
     "The Sandbox runs real Python in isolation; results are exact and reproducible.",
     "You computed an average and a top month from a dataset the agent could analyze.",
   ],
-  next: { slug: "vectorize-rag", label: "Ground answers in your own data" },
+  next: { slug: "reconcile-transactions", label: "Reconcile transactions with an agent" },
 
   status: "published",
 };

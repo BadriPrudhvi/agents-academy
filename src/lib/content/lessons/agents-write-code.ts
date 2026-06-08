@@ -107,6 +107,12 @@ export const agentsWriteCode: Lesson = {
       ],
     },
     {
+      kind: "watch",
+      labId: "codemode-sales",
+      audience: "concept",
+      caption: "No code needed — run the finished Code Mode task and see the top product it computes.",
+    },
+    {
       kind: "prose",
       audience: "concept",
       text: "Switch to **Code** view to write it yourself — it's about six lines.",
@@ -122,6 +128,7 @@ export const agentsWriteCode: Lesson = {
 
     { kind: "heading", text: "Check your understanding", id: "check" },
     { kind: "quiz", quizId: "why-code-mode" },
+    { kind: "quiz", quizId: "code-mode-safe" },
   ],
 
   labs: {
@@ -167,6 +174,19 @@ export const agentsWriteCode: Lesson = {
       answerIndex: 1,
       explanation:
         "Each extra tool definition costs context and adds ambiguity. Code Mode exposes one code tool with typed codemode.* methods, so context stays constant no matter how many APIs are available.",
+    },
+    "code-mode-safe": {
+      id: "code-mode-safe",
+      question: "How is it safe to let the model write and run code?",
+      options: [
+        "It isn't — Code Mode is only for trusted models",
+        "The code runs in an isolated V8 isolate with no secret access; it can only call the typed codemode.* methods you exposed",
+        "The code is reviewed by a human before every run",
+        "It runs directly on your laptop with full permissions",
+      ],
+      answerIndex: 1,
+      explanation:
+        "Generated code executes in an isolated Dynamic Worker / V8 isolate with no network or secret access — its only capabilities are the typed codemode.* methods you chose to expose, so a bad or buggy program can't reach anything sensitive.",
     },
   },
 

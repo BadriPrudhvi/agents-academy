@@ -32,6 +32,19 @@ export interface DiagramEdge {
   label?: string;
 }
 
+/** One step in a vertical agent-flow diagram (codemode-talk style): a colored,
+ *  rounded box joined to the next by a downward arrow. */
+export interface FlowStep {
+  /** Small uppercase role label, e.g. "GOAL", "MODEL", "TOOL CALL". */
+  label: string;
+  /** Colour role → token. */
+  tone?: "user" | "model" | "tool" | "result";
+  /** Optional plain-language line under the label. */
+  text?: string;
+  /** Optional monospace line — a tool call with args, or returned data. */
+  code?: string;
+}
+
 /** A unit of lesson body. Rendered by the article page block-by-block. */
 export type Block = ({ audience?: Audience }) & (
   | { kind: "prose"; text: string }
@@ -40,62 +53,23 @@ export type Block = ({ audience?: Audience }) & (
   | { kind: "callout"; tone: "note" | "tip" | "warning"; title?: string; text: string }
   | { kind: "list"; ordered?: boolean; items: string[] }
   | { kind: "diagram"; title?: string; nodes: DiagramNode[]; edges: DiagramEdge[] }
+  | {
+      kind: "agentFlow";
+      title?: string;
+      caption?: string;
+      steps: FlowStep[];
+      /** Optional repeating range (inclusive step indices) drawn as a "loop"
+       *  group. `label` is the top chip; `note` is an optional bottom cue. */
+      loop?: { from: number; to: number; label?: string; note?: string };
+    } // vertical box-flow (codemode-talk style)
   | { kind: "analogy"; role: string; text: string } // role-tailored framing
   | { kind: "watch"; labId: string; caption?: string } // no-code "see it run" (runs the solution)
-  | { kind: "agentSim"; simId: string } // no-code interactive: drive an agent, watch the loop
-  | { kind: "agentBuilder"; builderId: string } // no-code builder: add capabilities one by one
   | { kind: "agentStudio"; studioId: string } // unified: build + edit + AI codegen + run for real
   | { kind: "agentRun"; runId: string } // a REAL agent loop: model decides -> tool -> observe -> answer
+  | { kind: "streamChat"; chatId: string } // a live chat that streams tokens from Workers AI
   | { kind: "codelab"; labId: string } // anchors the interactive island
   | { kind: "quiz"; quizId: string }
 );
-
-/* ── Agent Playground: a no-code interactive that makes the agent loop tangible ── */
-
-export interface AgentSimGoal {
-  id: string;
-  /** What the learner asks the agent to do. */
-  label: string;
-  /** Tool the agent calls for this goal (display only). */
-  toolName: string;
-  /** Server-only JS program (uses codemode.*); executed by the runner. Never sent to the client. */
-  program: string;
-  /** Scripted "how the agent is thinking" steps (labeled as illustration). */
-  steps: string[];
-  /** Illustrative ungrounded chatbot answer, for the contrast. */
-  chatbotGuess: string;
-  /** Known correct answer — shown in mock dev and used as a fallback. */
-  expectedAnswer: string;
-}
-
-export interface AgentSim {
-  id: string;
-  /** The tool the agent has access to (display). */
-  toolName: string;
-  /** The data the tool returns — shown so the learner sees what the agent read. */
-  toolPreview: { columns: string[]; rows: (string | number)[][] };
-  goals: AgentSimGoal[];
-  /** Ask the learner to predict the first step before running (active learning). */
-  predict?: boolean;
-}
-
-/* ── Agent Builder: click-to-add capabilities and see code + behavior grow ── */
-export interface AgentBuilderStep {
-  id: string;
-  label: string;
-  plain: string;
-  /** Code snippet unlocked by this step. Displayed as generated code. */
-  code: string;
-  /** What Run should show after this step is included. */
-  output: string;
-}
-
-export interface AgentBuilder {
-  id: string;
-  title: string;
-  intro: string;
-  steps: AgentBuilderStep[];
-}
 
 /* ── Agent Studio: unified build + edit + AI-write + run-for-real interactive ── */
 
@@ -145,6 +119,20 @@ export interface AgentRun {
   /** Tools the agent can choose to call (display only; execution is server-side). */
   tools: { name: string; description: string }[];
   /** Example goals the learner can click to try. */
+  examples: string[];
+}
+
+/* ── Stream Chat: a live, no-code chat that streams tokens from Workers AI ── */
+export interface StreamChat {
+  id: string;
+  intro: string;
+  /** Display name of the model (shown to the learner). */
+  model: string;
+  /** Workers AI model id used server-side (authored, trusted). */
+  modelId: string;
+  /** System prompt that frames the assistant. */
+  system: string;
+  /** Example prompts the learner can click to try. */
   examples: string[];
 }
 
@@ -222,10 +210,9 @@ export interface Lesson {
   blocks: Block[];
   labs: Record<string, InteractiveLab>;
   quizzes: Record<string, RetrievalQuiz>;
-  sims?: Record<string, AgentSim>;
-  builders?: Record<string, AgentBuilder>;
   studios?: Record<string, AgentStudio>;
   agentRuns?: Record<string, AgentRun>;
+  streamChats?: Record<string, StreamChat>;
 
   recap: string[];
   next?: { slug: string; label: string };

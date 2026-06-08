@@ -99,6 +99,12 @@ export const financeReconciliation: Lesson = {
       ],
     },
     {
+      kind: "watch",
+      labId: "reconcile",
+      audience: "concept",
+      caption: "No code needed — run the reconciliation and see which transactions don't match.",
+    },
+    {
       kind: "prose",
       audience: "concept",
       text: "Switch to **Code** view to complete it — the matching rule is two lines.",
@@ -114,6 +120,7 @@ export const financeReconciliation: Lesson = {
 
     { kind: "heading", text: "Check your understanding", id: "check" },
     { kind: "quiz", quizId: "why-code-match" },
+    { kind: "quiz", quizId: "what-agent-returns" },
   ],
 
   labs: {
@@ -159,6 +166,19 @@ export const financeReconciliation: Lesson = {
       answerIndex: 1,
       explanation:
         "Reconciliation is high-stakes and rule-based. Comparing id + amount in code yields the same answer every time and can be audited; asking a model to 'judge' matches is neither reliable nor reproducible.",
+    },
+    "what-agent-returns": {
+      id: "what-agent-returns",
+      question: "After reconciling, what's most useful for the agent to hand back?",
+      options: [
+        "Every row from both sources, re-listed",
+        "Only the exceptions — the entries that didn't match — for a human to review",
+        "A yes/no 'did it balance?' with no detail",
+        "A natural-language guess about what probably went wrong",
+      ],
+      answerIndex: 1,
+      explanation:
+        "The whole point is to cut the manual work: the agent compares everything and surfaces just the unmatched entries (with their ids), so a person only chases the handful of real exceptions.",
     },
   },
 

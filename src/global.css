@@ -131,6 +131,13 @@ html.dark {
   display: none;
 }
 
+/* ===== Role filtering (driven by RolePicker, applied to analogy clusters) =====
+   A role-tagged block hidden by the role pass gets data-role-hide. Kept simple
+   so it cooperates with the audience rules above. */
+[data-role-hide] {
+  display: none;
+}
+
 @layer base {
   * {
     border-color: var(--color-border-100);

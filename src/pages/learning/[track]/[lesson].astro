@@ -1,6 +1,7 @@
 ---
 import Base from "../../../layouts/Base.astro";
 import { getLesson, getTrack } from "../../../lib/content";
+import { roleIdFromLabel } from "../../../lib/roles";
 import { highlight } from "../../../lib/highlight";
 import CodeLab from "../../../components/interactive/code-lab/CodeLab.tsx";
 import Quiz from "../../../components/interactive/Quiz.tsx";
@@ -8,10 +9,11 @@ import TutorPanel from "../../../components/interactive/tutor/TutorPanel.tsx";
 import LessonProgress from "../../../components/interactive/LessonProgress.tsx";
 import ViewToggle from "../../../components/interactive/ViewToggle.tsx";
 import AgentDiagram from "../../../components/interactive/AgentDiagram.tsx";
-import AgentBuilder from "../../../components/interactive/AgentBuilder.tsx";
+import FlowDiagram from "../../../components/interactive/FlowDiagram.tsx";
+
 import AgentStudio from "../../../components/interactive/AgentStudio.tsx";
 import AgentRun from "../../../components/interactive/AgentRun.tsx";
-import AgentSim from "../../../components/interactive/AgentSim.tsx";
+import StreamingChat from "../../../components/interactive/StreamingChat.tsx";
 import WatchItRun from "../../../components/interactive/WatchItRun.tsx";
 import LessonFeedback from "../../../components/interactive/LessonFeedback.tsx";
 import { Clock, Target } from "@phosphor-icons/react";
@@ -91,7 +93,11 @@ const calloutTone: Record<string, string> = {
         </div>
 
         {lesson.blocks.map((b, i) => (
-          <div data-aud={b.audience ?? undefined}>
+          <div
+            data-aud={b.audience ?? undefined}
+            data-analogy-role={b.kind === "analogy" ? (roleIdFromLabel(b.role) ?? slugify(b.role)) : undefined}
+            data-role-hide={b.kind === "analogy" && i > 0 && lesson.blocks[i - 1].kind === "analogy" ? "true" : undefined}
+          >
             {b.kind === "heading" && (
               <h2 id={b.id ?? slugify(b.text)} class="mt-10 scroll-mt-20 text-2xl">{b.text}</h2>
             )}
@@ -122,34 +128,11 @@ const calloutTone: Record<string, string> = {
             {b.kind === "diagram" && (
               <AgentDiagram client:visible title={b.title} nodes={b.nodes} edges={b.edges} />
             )}
+            {b.kind === "agentFlow" && (
+              <FlowDiagram client:visible title={b.title} caption={b.caption} steps={b.steps} loop={b.loop} />
+            )}
             {b.kind === "watch" && lesson.labs[b.labId] && (
               <WatchItRun client:visible lessonSlug={lesson.slug} labId={b.labId} caption={b.caption} />
-            )}
-            {b.kind === "agentSim" && lesson.sims?.[b.simId] && (
-              <AgentSim
-                client:visible
-                lessonSlug={lesson.slug}
-                simId={lesson.sims[b.simId].id}
-                toolName={lesson.sims[b.simId].toolName}
-                toolPreview={lesson.sims[b.simId].toolPreview}
-                predict={lesson.sims[b.simId].predict}
-                goals={lesson.sims[b.simId].goals.map((g) => ({
-                  id: g.id,
-                  label: g.label,
-                  toolName: g.toolName,
-                  steps: g.steps,
-                  chatbotGuess: g.chatbotGuess,
-                  expectedAnswer: g.expectedAnswer,
-                }))}
-              />
-            )}
-            {b.kind === "agentBuilder" && lesson.builders?.[b.builderId] && (
-              <AgentBuilder
-                client:visible
-                title={lesson.builders[b.builderId].title}
-                intro={lesson.builders[b.builderId].intro}
-                steps={lesson.builders[b.builderId].steps}
-              />
             )}
             {b.kind === "agentRun" && lesson.agentRuns?.[b.runId] && (
               <AgentRun
@@ -160,6 +143,16 @@ const calloutTone: Record<string, string> = {
                 model={lesson.agentRuns[b.runId].model}
                 tools={lesson.agentRuns[b.runId].tools}
                 examples={lesson.agentRuns[b.runId].examples}
+              />
+            )}
+            {b.kind === "streamChat" && lesson.streamChats?.[b.chatId] && (
+              <StreamingChat
+                client:visible
+                lessonSlug={lesson.slug}
+                chatId={lesson.streamChats[b.chatId].id}
+                intro={lesson.streamChats[b.chatId].intro}
+                model={lesson.streamChats[b.chatId].model}
+                examples={lesson.streamChats[b.chatId].examples}
               />
             )}
             {b.kind === "agentStudio" && lesson.studios?.[b.studioId] && (
@@ -244,3 +237,36 @@ const calloutTone: Record<string, string> = {
 
   <TutorPanel client:idle lessonSlug={lesson.slug} />
 </Base>
+
+<script>
+  /* Role-aware analogies: within each contiguous cluster of "In your world"
+     blocks, show only the one matching the selected role; if the role has no
+     analogy, fall back to the first in the cluster. Progressive enhancement —
+     without JS every analogy shows (the prior behaviour). */
+  import { ROLE_KEY } from "../../../lib/roles";
+
+  function applyRoleAnalogies() {
+    const body = document.getElementById("lesson-body");
+    if (!body) return;
+    let current: string | null = null;
+    try {
+      current = localStorage.getItem(ROLE_KEY);
+    } catch {}
+
+    const kids = Array.from(body.children).filter((el): el is HTMLElement => el instanceof HTMLElement);
+    for (let i = 0; i < kids.length; ) {
+      if (!kids[i].hasAttribute("data-analogy-role")) {
+        i++;
+        continue;
+      }
+      const group: HTMLElement[] = [];
+      while (i < kids.length && kids[i].hasAttribute("data-analogy-role")) group.push(kids[i++]);
+      const chosen = group.find((el) => el.getAttribute("data-analogy-role") === current) ?? group[0];
+      for (const el of group) el.toggleAttribute("data-role-hide", el !== chosen);
+    }
+  }
+
+  applyRoleAnalogies();
+  window.addEventListener("aa:role-change", applyRoleAnalogies);
+  document.addEventListener("astro:after-swap", applyRoleAnalogies);
+</script>

@@ -8,7 +8,7 @@ import type { Lesson } from "../types";
 const wranglerConfig = `{
   "name": "my-first-agent",
   "main": "src/index.ts",
-  "compatibility_date": "2025-05-25",
+  "compatibility_date": "2026-06-08",
   "compatibility_flags": ["nodejs_compat"],
   "ai": { "binding": "AI" },
   "durable_objects": {
@@ -168,7 +168,18 @@ export const yourFirstAgent: Lesson = {
     {
       kind: "prose",
       audience: "concept",
-      text: "That's the whole pattern: **input → think (model) → remember (state) → respond**. Switch to **Code** view (top right) anytime to see — and run — the real implementation.",
+      text: "That's the whole pattern: **input → think (model) → remember (state) → respond**.",
+    },
+    {
+      kind: "watch",
+      labId: "greeter",
+      audience: "concept",
+      caption: "No code needed — run the finished agent and watch it greet someone (and count the greeting).",
+    },
+    {
+      kind: "prose",
+      audience: "concept",
+      text: "Switch to **Code** view (top right) anytime to see — and build — the real implementation.",
     },
 
     // ── Code view ──
@@ -176,7 +187,14 @@ export const yourFirstAgent: Lesson = {
     {
       kind: "prose",
       audience: "code",
-      text: "You extend `Agent<Env, State>` and implement a handler such as `onRequest`. Inside, `this.env` exposes your bindings (like `AI`), and `this.state` / `this.setState` persist data automatically.",
+      text: "You extend `Agent<Env, State>` and implement a handler such as `onRequest`. Inside, `this.env` exposes your **bindings** (like `AI`), and `this.state` / `this.setState` persist data automatically.",
+    },
+    {
+      kind: "callout",
+      tone: "note",
+      audience: "code",
+      title: "New words (in plain English)",
+      text: "**Durable Object** — a single, always-there copy of your agent with its own tiny built-in database. That's what makes its memory durable. **`<Env, State>`** — you're just telling TypeScript the shape of your bindings (`Env`) and your saved data (`State`). **Binding** — a ready-to-use connection to a resource (like the AI model) that shows up on `this.env`. You don't need to memorize these — they'll feel natural after one or two lessons.",
     },
     {
       kind: "code",
@@ -201,6 +219,7 @@ export const yourFirstAgent: Lesson = {
     },
 
     { kind: "heading", text: "Check your understanding", id: "check" },
+    { kind: "quiz", quizId: "how-agent-calls-model" },
     { kind: "quiz", quizId: "where-state-lives" },
   ],
 
@@ -239,6 +258,19 @@ export const yourFirstAgent: Lesson = {
   },
 
   quizzes: {
+    "how-agent-calls-model": {
+      id: "how-agent-calls-model",
+      question: "How does the agent produce its greeting text?",
+      options: [
+        "It picks from a fixed list of canned greetings",
+        "It calls a model via the AI binding (this.env.AI.run) and uses the response",
+        "It queries an external database",
+        "It asks the user to type the greeting",
+      ],
+      answerIndex: 1,
+      explanation:
+        "The agent calls Workers AI through its AI binding — this.env.AI.run(model, { messages }) — and uses the returned `response` text. There's no canned list, external database, or user input involved.",
+    },
     "where-state-lives": {
       id: "where-state-lives",
       question: "Where does an Agent's state physically live?",

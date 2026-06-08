@@ -79,21 +79,17 @@ export const whatIsAnAgent: Lesson = {
       text: "An **AI agent** is a **model** (the brain) wired into a **loop** with **tools**. Given a goal, the model **decides** what to do, **calls a tool** to act or fetch data, **reads the result**, and repeats until it can **answer** — grounded in what it found. A plain chatbot just replies from memory; an agent decides, uses tools, and gets things done.",
     },
     {
-      kind: "diagram",
-      title: "The agent loop: model + tools",
-      nodes: [
-        { id: "goal", label: "Your goal", tone: "user", x: 0, y: 120 },
-        { id: "agent", label: "Agent (the loop)", tone: "agent", x: 230, y: 120 },
-        { id: "model", label: "Model — decides", tone: "model", x: 500, y: 20 },
-        { id: "tools", label: "Tools — act / fetch", tone: "tool", x: 500, y: 130 },
-        { id: "result", label: "Answer", tone: "state", x: 500, y: 240 },
-      ],
-      edges: [
-        { from: "goal", to: "agent", label: "goal" },
-        { from: "agent", to: "model", label: "1 · think" },
-        { from: "agent", to: "tools", label: "2 · act" },
-        { from: "tools", to: "agent", label: "3 · observe (loop)" },
-        { from: "agent", to: "result", label: "4 · answer" },
+      kind: "agentFlow",
+      title: "The agent loop: decide → act → observe → answer",
+      caption:
+        "The middle three steps — decide, act, observe — repeat until the model has enough to answer. That loop, grounded in real data, is the agent.",
+      loop: { from: 1, to: 3, label: "repeats until it can answer", note: "↑ not done? back to decide" },
+      steps: [
+        { label: "Goal", tone: "user", text: "What you want done, in plain English" },
+        { label: "Model decides", tone: "model", text: "Reads the goal and picks the right tool" },
+        { label: "Tool call", tone: "tool", code: "tool(arguments)" },
+        { label: "Reads the result", tone: "result", code: "{ real data returned }" },
+        { label: "Model answers", tone: "model", text: "Replies, grounded in what it read" },
       ],
     },
     {
@@ -119,7 +115,7 @@ export const whatIsAnAgent: Lesson = {
     {
       kind: "prose",
       audience: "concept",
-      text: "Here is an actual agent — a **model** with one **tool** (`getSales`). Give it a goal in plain English. Watch it **decide** to call the tool, **read** the real data, and **answer** from it. That decide → act → observe → answer loop is the agent. Notice it never guesses the numbers; it fetches them.",
+      text: "Here is an actual agent — a **model** with two **tools** (`getSales` and `getSalesByRegion`). Give it a goal in plain English and watch the loop: it **decides** which tool fits, **calls** it (you'll see the arguments it picked), **reads** the real rows that come back, and **answers** from them. Decide → act → observe → answer. Notice it never guesses the numbers; it fetches them.",
     },
     { kind: "agentRun", runId: "sales", audience: "concept" },
     {
@@ -170,12 +166,15 @@ export const whatIsAnAgent: Lesson = {
   agentRuns: {
     sales: {
       id: "sales",
-      intro: "A real agent: a model with one tool. Give it a goal — it decides to call the tool, reads the data, and answers.",
+      intro: "A real agent: a model with two tools. Give it a goal — it decides which tool to call, reads the real data, and answers from it.",
       model: "GLM-4.7-Flash (Workers AI)",
-      tools: [{ name: "getSales", description: "Returns sales records (product, region, revenue)." }],
+      tools: [
+        { name: "getSales", description: "Returns every sales record (product, region, revenue)." },
+        { name: "getSalesByRegion", description: "Returns sales records for one region (NA or EU)." },
+      ],
       examples: [
         "Which product made the most money?",
-        "Which region had the highest revenue?",
+        "How did the EU region do?",
         "What's our total revenue?",
       ],
     },
@@ -228,7 +227,7 @@ export const whatIsAnAgent: Lesson = {
     "That's different from a chatbot, which just replies once and forgets.",
     "You built and ran a real agent — by clicking, by asking in English, or by editing code.",
   ],
-  next: { slug: "your-first-agent", label: "Build your first agent" },
+  next: { slug: "first-worker", label: "Your first Worker" },
 
   status: "published",
 };
