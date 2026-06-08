@@ -1,12 +1,13 @@
 import { motion } from "motion/react";
 import type { DiagramEdge, DiagramNode } from "@/lib/content/types";
+import { TONE_VAR } from "@/lib/ui/tones";
 
 const TONE: Record<string, string> = {
-  user: "var(--color-foreground-300)",
-  agent: "var(--color-accent-100)",
-  model: "var(--color-ai-100)",
-  tool: "var(--color-compute-100)",
-  state: "var(--color-media-100)",
+  user: TONE_VAR.foreground,
+  agent: TONE_VAR.accent,
+  model: TONE_VAR.ai,
+  tool: TONE_VAR.compute,
+  state: TONE_VAR.media,
 };
 
 const NODE_W = 150;

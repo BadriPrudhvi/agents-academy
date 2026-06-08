@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { motion } from "motion/react";
 import { ArrowsClockwise } from "@phosphor-icons/react";
 import type { FlowStep } from "@/lib/content/types";
+import { FLOW_VARIANT as VARIANT } from "@/lib/ui/tones";
 
 /**
  * Vertical agent-flow diagram, ported from threepointone/codemode-talk's
@@ -11,16 +12,10 @@ import type { FlowStep } from "@/lib/content/types";
  * no edge/label collision class of bugs.
  *
  * Role → colour mirrors codemode-talk: user = accent (orange), model = ai
- * (green), tool = compute (blue), result = muted. An optional `loop` wraps a
- * contiguous range of steps in a dashed "repeats" group so the cycle is visible.
+ * (green), tool = compute (blue), result = muted. The class pairs live in
+ * lib/ui/tones.ts (FLOW_VARIANT). An optional `loop` wraps a contiguous range of
+ * steps in a dashed "repeats" group so the cycle is visible.
  */
-const VARIANT: Record<string, { box: string; label: string }> = {
-  user: { box: "border-accent-100/40 bg-accent-100/5", label: "text-accent-100" },
-  model: { box: "border-ai-100/40 bg-ai-100/5", label: "text-ai-100" },
-  tool: { box: "border-compute-100/50 bg-compute-100/10", label: "text-compute-100" },
-  result: { box: "border-border-100 bg-background-300", label: "text-text-secondary" },
-};
-
 function Arrow({ delay }: { delay: number }) {
   return (
     <motion.div

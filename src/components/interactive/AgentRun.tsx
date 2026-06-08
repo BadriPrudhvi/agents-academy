@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { Brain, CaretRight, CheckCircle, Code, Cpu, Eye, Flag, Spinner, Wrench } from "@phosphor-icons/react";
 import type { AgentStep as Step } from "@/lib/content/agent-trace";
+import { TONE_VAR } from "@/lib/ui/tones";
 
 interface Tool {
   name: string;
@@ -17,11 +18,11 @@ interface Props {
 }
 
 const STEP_META: Record<Step["type"], { icon: typeof Brain; label: string; tone: string }> = {
-  goal: { icon: Flag, label: "Goal", tone: "var(--color-foreground-300)" },
-  think: { icon: Brain, label: "Decides", tone: "var(--color-media-100)" },
-  tool: { icon: Wrench, label: "Calls a tool", tone: "var(--color-compute-100)" },
-  observe: { icon: Eye, label: "Reads the result", tone: "var(--color-ai-100)" },
-  answer: { icon: CheckCircle, label: "Answers", tone: "var(--color-ai-100)" },
+  goal: { icon: Flag, label: "Goal", tone: TONE_VAR.foreground },
+  think: { icon: Brain, label: "Decides", tone: TONE_VAR.media },
+  tool: { icon: Wrench, label: "Calls a tool", tone: TONE_VAR.compute },
+  observe: { icon: Eye, label: "Reads the result", tone: TONE_VAR.ai },
+  answer: { icon: CheckCircle, label: "Answers", tone: TONE_VAR.ai },
 };
 
 /* The real loop behind the trace above — every beat the learner watched maps to
