@@ -86,6 +86,7 @@ export const streamingChat: Lesson = {
   title: "Stream responses to a chat UI",
   summary:
     "Put a live chat UI on your agent: tokens stream in as they're generated, messages persist, and the connection resumes if it drops.",
+  bigIdea: "Stream tokens as they're generated — chat should feel **alive**, not frozen.",
 
   outcomes: [
     "Explain why agents stream tokens instead of waiting for the full reply.",
@@ -114,13 +115,22 @@ export const streamingChat: Lesson = {
     { kind: "heading", text: "Why stream?", id: "why" },
     {
       kind: "prose",
-      text: "Models generate text **one token at a time**. If you wait for the whole answer before showing anything, a long reply feels frozen. **Streaming** sends each piece as it's produced, so words appear as the model 'types'. For chat, that difference is the whole experience.",
+      text: "Models generate one token at a time. Wait for the whole answer and a long reply feels frozen; stream each piece and words appear as the model types.",
+    },
+    {
+      kind: "compare",
+      left: {
+        title: "Wait for the full reply",
+        items: ["Long pause — looks frozen", "User stares at a spinner"],
+      },
+      right: {
+        title: "Stream token by token",
+        items: ["Words appear as generated", "Feels alive — read as it comes"],
+      },
     },
     {
       kind: "diagram",
       title: "How a streamed chat turn flows",
-      caption:
-        "AIChatAgent owns the WebSocket and SQLite. You only write onChatMessage — the streaming, persistence, and resume are handled for you.",
       nodes: [
         { id: "send", label: "You send", tone: "user", icon: "message", x: 0, y: 80 },
         { id: "agent", label: "AIChatAgent", tone: "model", icon: "agent", x: 230, y: 80 },
@@ -136,48 +146,25 @@ export const streamingChat: Lesson = {
         { from: "chunks", to: "stream", label: "more tokens? stream on", curve: 110 },
       ],
     },
+    { kind: "statement", text: "AIChatAgent gives you the hard parts **for free**.", sub: "WebSocket · persistence · resume · multi-client — you write one method" },
     {
       kind: "analogy",
       role: "Data analyst",
       audience: "concept",
-      text: "It's the difference between a report that pops up all at once after a long wait, and a live cell that fills in as the calculation runs — you can start reading immediately.",
-    },
-    {
-      kind: "analogy",
-      role: "Finance",
-      audience: "concept",
-      text: "Like watching a figure tick up live instead of staring at a spinner — and if your connection drops, you rejoin exactly where the number was, not back at zero.",
-    },
-    {
-      kind: "callout",
-      tone: "note",
-      title: "What you get for free",
-      text: "Message persistence, resume-on-reconnect (the server keeps streaming while you're away), and multi-client sync — all from AIChatAgent. You write the model call; the SDK does the rest.",
+      text: "Like a live cell that fills in as the calculation runs, instead of a report that pops up all at once after a long wait — you start reading immediately.",
     },
 
     { kind: "heading", text: "Try it: watch tokens stream", id: "try", audience: "concept" },
     {
       kind: "prose",
       audience: "concept",
-      text: "Send a message and watch the reply appear **word by word** — each token shown the moment the model produces it, instead of waiting for the whole answer. That's the difference streaming makes.",
+      text: "Send a message and watch the reply appear **word by word** — each token the moment the model produces it.",
     },
     { kind: "streamChat", chatId: "chat", audience: "concept" },
-
-    // ── Concept-only ──
-    {
-      kind: "list",
-      audience: "concept",
-      items: [
-        "The user's message is saved the moment it arrives.",
-        "The agent asks the model and streams the reply token by token.",
-        "If the connection drops, the server keeps going and you resume on reconnect.",
-        "When done, the final message is saved and shared with every open tab.",
-      ],
-    },
     {
       kind: "prose",
       audience: "concept",
-      text: "Switch to **Code** view to see the (surprisingly small) server and client.",
+      text: "Switch to **Code** to see the (surprisingly small) server and client.",
     },
 
     // ── Code view ──
@@ -200,7 +187,7 @@ export const streamingChat: Lesson = {
     {
       kind: "prose",
       audience: "code",
-      text: "Put together, you build a model, call `streamText`, and return `result.toUIMessageStreamResponse()`. `this.messages` is the persisted history — already there for you.",
+      text: "Build a model, call `streamText`, return `result.toUIMessageStreamResponse()`. `this.messages` is the persisted history — already there.",
     },
     {
       kind: "code",
@@ -248,7 +235,7 @@ export const streamingChat: Lesson = {
   streamChats: {
     chat: {
       id: "chat",
-      intro: "A live chat that streams its reply token by token — the same experience AIChatAgent gives your users.",
+      intro: "",
       model: "Llama 3.3 70B (Workers AI)",
       modelId: "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
       system: "You are a friendly, concise assistant for a course on building AI agents. Reply in 2–4 short sentences.",

@@ -100,8 +100,8 @@ export default function StreamingChat(props: Props) {
   return (
     <section className="my-8 rounded-xl border border-border-100 bg-background-content">
       <div className="border-b border-border-100 px-5 py-4">
-        <p className="text-sm text-foreground-200">{props.intro}</p>
-        <p className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-text-secondary">
+        {props.intro && <p className="text-sm text-foreground-200">{props.intro}</p>}
+        <p className={`flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-text-secondary ${props.intro ? "mt-2" : ""}`}>
           <span className="inline-flex items-center gap-1.5">
             <Cpu size={13} /> Streaming from {props.model}
           </span>

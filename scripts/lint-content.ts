@@ -81,8 +81,8 @@ async function lintLesson(l: Lesson) {
   }
 
   // ── StreamChat integrity (live token-streaming chat) ──
+  // intro is optional — the lead line can live in the lesson body instead.
   for (const c of Object.values(l.streamChats ?? {})) {
-    if (!c.intro.trim()) fail(l.slug, `streamChat '${c.id}' missing intro`);
     if (!c.modelId.trim()) fail(l.slug, `streamChat '${c.id}' missing modelId`);
     if (!c.system.trim()) fail(l.slug, `streamChat '${c.id}' missing system prompt`);
     if (c.examples.length < 1) fail(l.slug, `streamChat '${c.id}' needs at least one example`);
