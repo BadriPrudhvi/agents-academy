@@ -13,7 +13,7 @@ import AgentStudio from "../../../components/interactive/AgentStudio.tsx";
 import AgentSim from "../../../components/interactive/AgentSim.tsx";
 import WatchItRun from "../../../components/interactive/WatchItRun.tsx";
 import LessonFeedback from "../../../components/interactive/LessonFeedback.tsx";
-import { Clock, Target, ListChecks } from "@phosphor-icons/react";
+import { Clock, Target } from "@phosphor-icons/react";
 
 const { track: trackId, lesson: slug } = Astro.params;
 const lesson = getLesson(slug ?? "");
@@ -80,12 +80,10 @@ const calloutTone: Record<string, string> = {
     <div class="mt-8 grid gap-10 lg:grid-cols-[1fr_16rem]">
       {/* Body */}
       <div class="min-w-0" id="lesson-body" data-view="concept">
-        {/* Why it matters + outcomes */}
-        <div class="mb-8 rounded-xl border border-border-100 bg-background-content p-5">
-          <p class="text-sm text-foreground-200"><strong>Why this matters.</strong> {lesson.whyItMatters}</p>
-          <p class="mt-3 flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-text-secondary">
-            <ListChecks size={13} /> By the end you can
-          </p>
+        {/* Why it matters + outcomes — light, no box */}
+        <div class="mb-10 border-l-2 border-border-200 pl-4">
+          <p class="text-foreground-200"><strong class="text-foreground-100">Why this matters.</strong> {lesson.whyItMatters}</p>
+          <p class="mt-3 text-[11px] uppercase tracking-wider text-text-secondary">By the end you can</p>
           <ul class="mt-1.5 list-disc space-y-1 pl-5 text-sm text-foreground-200">
             {lesson.outcomes.map((o) => <li>{o}</li>)}
           </ul>
@@ -109,7 +107,7 @@ const calloutTone: Record<string, string> = {
               </div>
             )}
             {b.kind === "analogy" && (
-              <div class="mt-5 rounded-lg border border-border-100 bg-background-300 px-4 py-3">
+              <div class="mt-5 border-l-2 border-accent-100/30 pl-4">
                 <p class="font-mono text-[11px] uppercase tracking-wider text-accent-muted">In your world — {b.role}</p>
                 <p class="mt-1 text-sm text-foreground-200" set:html={inline(b.text)} />
               </div>
@@ -192,7 +190,7 @@ const calloutTone: Record<string, string> = {
         ))}
 
         {/* Recap + next */}
-        <div class="mt-12 rounded-xl border border-border-100 bg-background-content p-5">
+        <div class="mt-12 border-t border-border-100 pt-6">
           <h2 class="text-xl">Recap</h2>
           <ul class="mt-2 list-disc space-y-1 pl-5 text-foreground-200">
             {lesson.recap.map((r) => <li>{r}</li>)}

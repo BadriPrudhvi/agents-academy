@@ -120,9 +120,8 @@ export const whatIsAnAgent: Lesson = {
     { kind: "agentStudio", studioId: "sales" },
 
     { kind: "heading", text: "Check your understanding", id: "check" },
-    { kind: "quiz", quizId: "agent-first-step" },
-    { kind: "quiz", quizId: "do-i-need-code" },
     { kind: "quiz", quizId: "agent-vs-chatbot" },
+    { kind: "quiz", quizId: "agent-first-step" },
   ],
 
   labs: {},

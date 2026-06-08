@@ -14,7 +14,7 @@ export default function Quiz({ question, options, answerIndex, explanation }: Pr
   const correct = choice === answerIndex;
 
   return (
-    <div className="my-8 rounded-xl border border-border-100 bg-background-content p-5">
+    <div className="my-6">
       <p className="mb-3 font-medium text-foreground-100">{question}</p>
       <div className="space-y-2">
         {options.map((opt, i) => {

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Editor from "@monaco-editor/react";
 import { motion } from "motion/react";
-import { ArrowCounterClockwise, MagicWand, Play, PlusCircle, Spinner, Terminal, Target } from "@phosphor-icons/react";
+import { ArrowCounterClockwise, MagicWand, Play, Plus, Spinner, Table } from "@phosphor-icons/react";
 
 interface Capability {
   id: string;
@@ -41,6 +41,8 @@ function sessionId(): string {
   }
 }
 
+const short = (label: string) => label.replace(/^Find the /, "").replace(/^Calculate /, "");
+
 export default function AgentStudio(props: Props) {
   const [code, setCode] = useState(props.starterProgram);
   const [theme, setTheme] = useState<"light" | "vs-dark">("light");
@@ -51,6 +53,8 @@ export default function AgentStudio(props: Props) {
   const [prompt, setPrompt] = useState("");
   const [aiBusy, setAiBusy] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [showSteps, setShowSteps] = useState(false);
+  const [showData, setShowData] = useState(false);
 
   useEffect(() => {
     const sync = () => setTheme(document.documentElement.classList.contains("dark") ? "vs-dark" : "light");
@@ -62,16 +66,15 @@ export default function AgentStudio(props: Props) {
 
   const goal = useMemo(() => props.goals.find((g) => g.id === goalId), [goalId, props.goals]);
 
-  function addCapability(c: Capability) {
-    setCode((prev) => `${prev.trimEnd()}\n${c.insert}\n`);
-  }
-
   function loadGoal(g: Goal) {
     setGoalId(g.id);
     setCode(g.program);
     setOutput(null);
   }
-
+  function addCapability(c: Capability) {
+    setCode((prev) => `${prev.trimEnd()}\n${c.insert}\n`);
+    setShowSteps(false);
+  }
   function reset() {
     setCode(props.starterProgram);
     setGoalId(null);
@@ -124,146 +127,138 @@ export default function AgentStudio(props: Props) {
     }
   }
 
+  const chip = "rounded-full border px-3 py-1 text-xs transition-colors";
+
   return (
-    <section className="my-8 overflow-hidden rounded-xl border border-border-100 bg-background-content">
-      <div className="border-b border-border-100 bg-ai-200/60 px-5 py-4">
-        <p className="text-sm font-medium text-foreground-100">{props.title}</p>
-        <p className="mt-1 text-sm text-foreground-200">{props.intro}</p>
+    <section className="my-8 rounded-xl border border-border-100 bg-background-content">
+      {/* Toolbar: start-from goals + on-demand controls */}
+      <div className="flex flex-wrap items-center gap-2 border-b border-border-100 px-4 py-3">
+        <span className="mr-1 font-mono text-[11px] uppercase tracking-wider text-text-secondary">Start from</span>
+        {props.goals.map((g) => (
+          <button
+            key={g.id}
+            onClick={() => loadGoal(g)}
+            className={`${chip} ${g.id === goalId ? "border-accent-100 bg-accent-100/10 text-accent-muted" : "border-border-100 text-foreground-200 hover:border-foreground-300"}`}
+          >
+            {short(g.label)}
+          </button>
+        ))}
+        <div className="ml-auto flex items-center gap-1">
+          <button
+            onClick={() => { setShowSteps((s) => !s); setShowData(false); }}
+            className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors ${showSteps ? "text-accent-muted" : "text-text-secondary hover:text-foreground-100"}`}
+          >
+            <Plus size={13} weight="bold" /> Add step
+          </button>
+          <button
+            onClick={() => { setShowData((s) => !s); setShowSteps(false); }}
+            className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors ${showData ? "text-accent-muted" : "text-text-secondary hover:text-foreground-100"}`}
+          >
+            <Table size={13} /> Data
+          </button>
+        </div>
       </div>
 
-      <div className="grid gap-5 p-5 lg:grid-cols-[300px_1fr]">
-        {/* Controls */}
-        <div className="space-y-5">
-          <div>
-            <p className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-text-secondary">
-              <Target size={13} /> Pick a goal
-            </p>
-            <div className="mt-2 grid gap-2">
-              {props.goals.map((g) => (
-                <button
-                  key={g.id}
-                  onClick={() => loadGoal(g)}
-                  className={`rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
-                    g.id === goalId ? "border-accent-100 bg-accent-100/10" : "border-border-100 hover:border-foreground-300"
-                  }`}
-                >
-                  {g.label}
-                </button>
-              ))}
-            </div>
-          </div>
+      {/* On-demand: capability chips */}
+      {showSteps && (
+        <div className="flex flex-wrap gap-2 border-b border-border-100 bg-background-300/50 px-4 py-3">
+          {props.capabilities.map((c) => (
+            <button key={c.id} onClick={() => addCapability(c)} title={c.plain} className={`${chip} border-border-100 text-foreground-200 hover:border-accent-100`}>
+              + {c.label}
+            </button>
+          ))}
+        </div>
+      )}
 
-          <div>
-            <p className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-text-secondary">
-              <PlusCircle size={13} /> Add a capability
-            </p>
-            <div className="mt-2 grid gap-2">
-              {props.capabilities.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => addCapability(c)}
-                  className="rounded-lg border border-border-100 px-3 py-2 text-left text-sm transition-colors hover:border-accent-100"
-                  title={c.plain}
-                >
-                  <span className="block font-medium text-foreground-100">{c.label}</span>
-                  <span className="mt-0.5 block text-xs text-foreground-200">{c.plain}</span>
-                </button>
+      {/* On-demand: sample data */}
+      {showData && (
+        <div className="overflow-x-auto border-b border-border-100 bg-background-300/50 px-4 py-3">
+          <p className="mb-2 font-mono text-[11px] text-text-secondary">{props.toolName}</p>
+          <table className="min-w-full text-left text-xs">
+            <thead className="text-text-secondary">
+              <tr>{props.toolPreview.columns.map((c) => <th key={c} className="pb-1 pr-6 font-medium">{c}</th>)}</tr>
+            </thead>
+            <tbody>
+              {props.toolPreview.rows.map((row, i) => (
+                <tr key={i}>{row.map((cell, j) => <td key={j} className="py-0.5 pr-6 font-mono">{cell}</td>)}</tr>
               ))}
-            </div>
-          </div>
+            </tbody>
+          </table>
+        </div>
+      )}
 
-          <div className="rounded-lg border border-border-100 bg-background-300 p-3">
-            <p className="font-mono text-[11px] uppercase tracking-wider text-text-secondary">Tool data — {props.toolName}</p>
-            <div className="mt-2 overflow-x-auto rounded-md border border-border-100 bg-background-content">
-              <table className="min-w-full text-left text-xs">
-                <thead className="border-b border-border-100 text-text-secondary">
-                  <tr>{props.toolPreview.columns.map((c) => <th key={c} className="px-2 py-1.5 font-medium">{c}</th>)}</tr>
-                </thead>
-                <tbody>
-                  {props.toolPreview.rows.map((row, i) => (
-                    <tr key={i} className="border-b border-border-100 last:border-b-0">
-                      {row.map((cell, j) => <td key={j} className="px-2 py-1.5 font-mono">{cell}</td>)}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+      <div className="space-y-3 p-4">
+        {/* Ask the AI */}
+        {props.aiEnabled && (
+          <form onSubmit={askAi} className="flex gap-2">
+            <div className="relative flex-1">
+              <MagicWand size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-accent-100" />
+              <input
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Or describe what you want in plain English…"
+                className="w-full rounded-md border border-border-100 bg-background-100 py-2 pl-9 pr-3 text-sm outline-none focus:ring-1 focus:ring-accent-100/50"
+              />
             </div>
-          </div>
+            <button type="submit" disabled={aiBusy} className="inline-flex items-center gap-1.5 rounded-md border border-border-100 px-3 py-2 text-sm text-foreground-100 hover:border-accent-100 disabled:opacity-50">
+              {aiBusy ? <Spinner size={14} className="animate-spin" /> : <MagicWand size={14} weight="fill" />} Write it
+            </button>
+          </form>
+        )}
+        {aiError && <p className="text-sm text-accent-muted">{aiError}</p>}
+
+        {/* Editor */}
+        <div className="overflow-hidden rounded-lg border border-border-100">
+          <Editor
+            height={280}
+            language="javascript"
+            value={code}
+            theme={theme}
+            onChange={(v) => setCode(v ?? "")}
+            loading={<div className="p-4 font-mono text-xs text-text-secondary">Loading editor…</div>}
+            options={{
+              minimap: { enabled: false },
+              fontSize: 13,
+              lineNumbers: "on",
+              scrollBeyondLastLine: false,
+              tabSize: 2,
+              padding: { top: 12, bottom: 12 },
+              fontFamily: "var(--font-mono)",
+              renderLineHighlight: "none",
+              overviewRulerLanes: 0,
+              folding: false,
+              scrollbar: { alwaysConsumeMouseWheel: false },
+            }}
+          />
         </div>
 
-        {/* Editor + AI + run */}
-        <div className="min-w-0 space-y-3">
-          {props.aiEnabled && (
-            <form onSubmit={askAi} className="flex flex-wrap gap-2">
-              <div className="relative flex-1">
-                <MagicWand size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-accent-100" />
-                <input
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Ask in plain English, e.g. “show revenue per region”"
-                  className="w-full rounded-md border border-border-100 bg-background-100 py-2 pl-9 pr-3 text-sm outline-none focus:ring-1 focus:ring-accent-100/50"
-                />
-              </div>
-              <button type="submit" disabled={aiBusy} className="inline-flex items-center gap-1.5 rounded-md bg-foreground-100 px-3 py-2 text-sm text-background-100 disabled:opacity-50">
-                {aiBusy ? <Spinner size={14} className="animate-spin" /> : <MagicWand size={14} weight="fill" />} Write it for me
-              </button>
-            </form>
-          )}
-          {aiError && <p className="rounded-md border border-security-100 bg-security-100/5 px-3 py-2 text-sm text-foreground-200">{aiError}</p>}
+        {/* Actions */}
+        <div className="flex items-center gap-2">
+          <button onClick={run} disabled={running} className="inline-flex items-center gap-1.5 rounded-md bg-accent-100 px-4 py-2 text-sm text-light-foreground disabled:opacity-50">
+            {running ? <Spinner size={15} className="animate-spin" /> : <Play size={15} weight="fill" />} Run in Sandbox
+          </button>
+          <button onClick={reset} className="inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm text-text-secondary hover:text-foreground-100">
+            <ArrowCounterClockwise size={15} /> Reset
+          </button>
+        </div>
 
-          <div className="overflow-hidden rounded-lg border border-border-100">
-            <Editor
-              height={300}
-              language="javascript"
-              value={code}
-              theme={theme}
-              onChange={(v) => setCode(v ?? "")}
-              loading={<div className="p-4 font-mono text-xs text-text-secondary">Loading editor…</div>}
-              options={{
-                minimap: { enabled: false },
-                fontSize: 13,
-                lineNumbers: "on",
-                scrollBeyondLastLine: false,
-                tabSize: 2,
-                padding: { top: 12, bottom: 12 },
-                fontFamily: "var(--font-mono)",
-                renderLineHighlight: "none",
-                overviewRulerLanes: 0,
-                scrollbar: { alwaysConsumeMouseWheel: false },
-              }}
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <button onClick={run} disabled={running} className="inline-flex items-center gap-1.5 rounded-md bg-accent-100 px-4 py-2 text-sm text-light-foreground disabled:opacity-50">
-              {running ? <Spinner size={15} className="animate-spin" /> : <Play size={15} weight="fill" />} Run in Sandbox
-            </button>
-            <button onClick={reset} className="inline-flex items-center gap-1.5 rounded-md border border-border-100 px-3 py-2 text-sm text-foreground-200 hover:border-foreground-300">
-              <ArrowCounterClockwise size={15} /> Reset
-            </button>
-          </div>
-
-          {(output !== null || running) && (
-            <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
-              <p className="flex items-center gap-2 px-1 py-1 font-mono text-[11px] uppercase tracking-wider text-text-secondary">
-                <Terminal size={13} /> Output
-                {engine === "sandbox" && <span className="rounded bg-ai-200 px-1.5 py-0.5 normal-case tracking-normal text-ai-100">real · Sandbox</span>}
-                {engine === "mock" && <span className="rounded bg-background-300 px-1.5 py-0.5 normal-case tracking-normal">deployed only</span>}
+        {/* Output */}
+        {(output !== null || running) && (
+          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+            <p className="mb-1 flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-text-secondary">
+              Output
+              {engine === "sandbox" && <span className="rounded bg-ai-200 px-1.5 py-0.5 normal-case tracking-normal text-ai-100">real · Sandbox</span>}
+            </p>
+            <pre className="overflow-x-auto rounded-lg bg-[#151414] px-4 py-3 font-mono text-[12.5px] leading-relaxed text-[#f0e3de]">
+              {running ? "Running in the Sandbox…" : output}
+            </pre>
+            {goal?.chatbotGuess && !running && (
+              <p className="mt-2 text-xs text-text-secondary">
+                A chatbot would have guessed: “{goal.chatbotGuess}” — your agent computed the real answer above.
               </p>
-              <pre className="overflow-x-auto rounded-lg bg-[#151414] px-4 py-3 font-mono text-[12.5px] leading-relaxed text-[#f0e3de]">
-                {running ? "Running in the Sandbox…" : output}
-              </pre>
-            </motion.div>
-          )}
-
-          {goal?.chatbotGuess && output && (
-            <div className="rounded-lg border border-border-100 px-4 py-3">
-              <p className="font-mono text-[11px] uppercase tracking-wider text-text-secondary">A chatbot would guess</p>
-              <p className="mt-1 text-sm text-foreground-200">{goal.chatbotGuess}</p>
-              <p className="mt-1 text-xs text-text-secondary">Your agent computed the real answer above from the data.</p>
-            </div>
-          )}
-        </div>
+            )}
+          </motion.div>
+        )}
       </div>
     </section>
   );
