@@ -46,9 +46,25 @@ const SIMULATORS: Record<string, Simulator> = {
     ].join("\n");
   },
 
-  // Lessons: agents-write-code (codemode-sales) + foundations (agent-demo) — same shape.
+  // Lesson: first-worker / lab: hello-worker
+  "hello-worker"(files) {
+    const src = stripComments(files.find((f) => f.path === "src/index.js")?.contents ?? "");
+    const readsQuery = src.includes("searchParams") || src.includes("new URL");
+    const body = readsQuery ? "Hello, Ada!" : "Hello World!";
+    return [
+      "$ wrangler dev",
+      "⛅️ Ready on http://localhost:8787",
+      "> GET /?name=Ada",
+      `< 200 ${body}`,
+      "",
+      readsQuery
+        ? "Reading the query string — greets whoever you pass as ?name=."
+        : "Not reading ?name= yet — every request gets the same fixed text.",
+    ].join("\n");
+  },
+
+  // Lesson: agents-write-code / lab: codemode-sales
   "codemode-sales": codemodeSalesSim,
-  "agent-demo": codemodeSalesSim,
 
   // Lesson: finance-reconciliation / lab: reconcile
   reconcile(files) {
