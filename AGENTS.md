@@ -29,6 +29,8 @@ Only deploy when the critic pass is clean. Never deploy on a hunch.
 - Do **not** commit unless explicitly asked.
 - Local `astro dev` is offline/mock; live Workers AI + Sandbox only run in the
   deployed `production` env.
-- Diagrams: all diagrams use the `agentFlow` block (FlowDiagram, codemode-talk
-  vertical box-flow) for one consistent visual language. The old SVG node-graph
-  (`diagram` block / AgentDiagram) was removed.
+- Diagrams: all diagrams use the `diagram` block (NodeGraph) — a horizontal,
+  theme-aware SVG node-graph in the Cloudflare marketing-site style (dotted
+  canvas, labels above, icons, corner handles, animated dashed connectors).
+  Loops use a curved feedback edge; branches fan up/down. Pure SVG (not React
+  Flow), so no keyboard-nav text leaks into crawled/reader output.

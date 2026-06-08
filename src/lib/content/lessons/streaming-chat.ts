@@ -117,17 +117,23 @@ export const streamingChat: Lesson = {
       text: "Models generate text **one token at a time**. If you wait for the whole answer before showing anything, a long reply feels frozen. **Streaming** sends each piece as it's produced, so words appear as the model 'types'. For chat, that difference is the whole experience.",
     },
     {
-      kind: "agentFlow",
+      kind: "diagram",
       title: "How a streamed chat turn flows",
       caption:
         "AIChatAgent owns the WebSocket and SQLite. You only write onChatMessage — the streaming, persistence, and resume are handled for you.",
-      loop: { from: 3, to: 3, label: "token by token", note: "↑ more tokens? keep streaming" },
-      steps: [
-        { label: "You send", tone: "user", text: "A message goes to the agent over a WebSocket" },
-        { label: "AIChatAgent", tone: "model", text: "Persists it to SQLite, then calls onChatMessage" },
-        { label: "streamText", tone: "tool", code: "streamText({ model, messages })" },
-        { label: "Chunks stream back", tone: "result", text: "Tokens arrive over the WebSocket as generated" },
-        { label: "Done", tone: "model", text: "Final message persisted + broadcast to all clients" },
+      nodes: [
+        { id: "send", label: "You send", tone: "user", icon: "message", x: 0, y: 80 },
+        { id: "agent", label: "AIChatAgent", tone: "model", icon: "agent", x: 230, y: 80 },
+        { id: "stream", label: "streamText", tone: "tool", icon: "code", x: 460, y: 80 },
+        { id: "chunks", label: "Chunks back", tone: "output", icon: "sparkle", x: 690, y: 80 },
+        { id: "done", label: "Done", tone: "model", icon: "chat", x: 920, y: 80 },
+      ],
+      edges: [
+        { from: "send", to: "agent" },
+        { from: "agent", to: "stream" },
+        { from: "stream", to: "chunks" },
+        { from: "chunks", to: "done" },
+        { from: "chunks", to: "stream", label: "more tokens? stream on", curve: 110 },
       ],
     },
     {

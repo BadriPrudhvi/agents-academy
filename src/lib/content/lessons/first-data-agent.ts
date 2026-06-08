@@ -72,13 +72,18 @@ export const firstDataAgent: Lesson = {
       text: "Language models are great at *planning* and terrible at *arithmetic*. The fix: give the agent a **Sandbox** — an isolated container — and let it run real **Python**. It writes code, the Sandbox runs it, and the agent reports the actual result.",
     },
     {
-      kind: "agentFlow",
+      kind: "diagram",
       title: "Agent + Sandbox",
-      steps: [
-        { label: "Question about data", tone: "user", text: "What you want to know." },
-        { label: "Agent", tone: "model", text: "Writes Python to answer it." },
-        { label: "Sandbox (Python)", tone: "tool", text: "Runs the code safely." },
-        { label: "Computed result", tone: "result", text: "Real numbers, not a guess." },
+      nodes: [
+        { id: "q", label: "Question", tone: "user", icon: "message", x: 0, y: 80 },
+        { id: "agent", label: "Agent", tone: "agent", icon: "agent", x: 240, y: 80 },
+        { id: "box", label: "Sandbox", tone: "tool", icon: "terminal", x: 480, y: 80 },
+        { id: "out", label: "Computed result", tone: "output", icon: "table", x: 720, y: 80 },
+      ],
+      edges: [
+        { from: "q", to: "agent" },
+        { from: "agent", to: "box", label: "writes + runs Python" },
+        { from: "box", to: "out", label: "real numbers" },
       ],
     },
     {

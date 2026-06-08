@@ -2,7 +2,7 @@
 import { roleIdFromLabel } from "../../lib/roles";
 import { inline, slugify } from "../../lib/content/inline";
 import type { Block, Lesson } from "../../lib/content/types";
-import FlowDiagram from "../interactive/FlowDiagram.tsx";
+import NodeGraph from "../interactive/NodeGraph.tsx";
 import WatchItRun from "../interactive/WatchItRun.tsx";
 import AgentRun from "../interactive/AgentRun.tsx";
 import StreamingChat from "../interactive/StreamingChat.tsx";
@@ -59,8 +59,8 @@ const calloutTone: Record<string, string> = {
       {b.caption && <figcaption class="mt-1.5 font-mono text-xs text-text-secondary">{b.caption}</figcaption>}
     </figure>
   )}
-  {b.kind === "agentFlow" && (
-    <FlowDiagram client:visible title={b.title} caption={b.caption} steps={b.steps} loop={b.loop} />
+  {b.kind === "diagram" && (
+    <NodeGraph client:visible title={b.title} caption={b.caption} nodes={b.nodes} edges={b.edges} />
   )}
   {b.kind === "watch" && lesson.labs[b.labId] && (
     <WatchItRun client:visible lessonSlug={lesson.slug} labId={b.labId} caption={b.caption} />

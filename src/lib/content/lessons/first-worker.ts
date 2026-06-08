@@ -96,14 +96,19 @@ export const firstWorker: Lesson = {
       text: "A **Worker** is a small piece of code that runs on Cloudflare's network — at the location nearest each user — without you managing any servers. A request comes in, your **`fetch` handler** runs, and you return a **`Response`**. That's the whole model. An **agent** is just a Worker with durable memory, so this is the shape everything else builds on.",
     },
     {
-      kind: "agentFlow",
+      kind: "diagram",
       title: "Request → Worker → Response",
       caption: "A Worker may call a binding (like env.AI) before it returns its response.",
-      steps: [
-        { label: "Request", tone: "user", text: "An HTTP request arrives at the edge." },
-        { label: "Worker (fetch)", tone: "model", text: "Your fetch handler runs." },
-        { label: "Binding (e.g. AI)", tone: "tool", text: "Optionally calls a binding like env.AI." },
-        { label: "Response", tone: "result", text: "Returns an HTTP response." },
+      nodes: [
+        { id: "req", label: "Request", tone: "user", icon: "globe", x: 0, y: 80 },
+        { id: "worker", label: "Worker (fetch)", tone: "agent", icon: "code", x: 240, y: 80 },
+        { id: "resp", label: "Response", tone: "output", icon: "arrowOut", x: 480, y: 0 },
+        { id: "binding", label: "Binding (AI)", tone: "tool", icon: "sparkle", x: 480, y: 160 },
+      ],
+      edges: [
+        { from: "req", to: "worker" },
+        { from: "worker", to: "resp", label: "return" },
+        { from: "worker", to: "binding", label: "env.AI" },
       ],
     },
     {

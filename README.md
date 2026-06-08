@@ -60,7 +60,7 @@ already caught a real authoring bug — see git history.)
 Astro SSR (Workers)
   Pages    /  ·  /learning  ·  /learning/[track]/[lesson]
   Islands  CodeLab · AgentStudio · AgentRun · StreamingChat · WatchItRun
-           FlowDiagram · Quiz · TutorPanel · RolePicker
+           NodeGraph · Quiz · TutorPanel · RolePicker
   API      POST /api/run         runner (mock | sandbox), server-side hidden checks
            POST /api/agent-run   a real model+tools loop (goal → think → tool → observe → answer)
            POST /api/chat-stream token streaming from Workers AI (SSE)

@@ -1,18 +1,15 @@
 /**
- * Single source for the agent-role colour language used by the diagrams and the
- * live run trace. Two representations live here because they serve two rendering
- * paths:
+ * Single source for the agent-role colour language, as CSS custom-property
+ * references, used where colour is applied inline (SVG fill/stroke/`color`).
  *
- *  - TONE_VAR    — CSS custom-property references, used where colour is applied
- *                  as an inline `color` (the AgentRun step trace).
- *  - FLOW_VARIANT — Tailwind utility-class pairs, used by the vertical
- *                  FlowDiagram boxes (border + background, and the label colour).
+ *  - TONE_VAR   — the AgentRun step-trace palette.
+ *  - NODE_TONE  — the node-graph (NodeGraph) palette, keyed by DiagramNode tone.
  *
- * Keeping them together means the palette is defined once and every consumer
- * references it, with no literal `var(--color-…)` strings duplicated per file.
+ * Defining them here means the palette lives in one place, with no literal
+ * `var(--color-…)` strings duplicated across components.
  */
 
-/** Semantic palette as CSS custom-property references. */
+/** Palette for the AgentRun live step trace. */
 export const TONE_VAR = {
   foreground: "var(--color-foreground-300)",
   ai: "var(--color-ai-100)",
@@ -20,10 +17,16 @@ export const TONE_VAR = {
   media: "var(--color-media-100)",
 } as const;
 
-/** Tailwind class pairs for the FlowDiagram boxes (border+bg / label colour). */
-export const FLOW_VARIANT: Record<string, { box: string; label: string }> = {
-  user: { box: "border-accent-100/40 bg-accent-100/5", label: "text-accent-100" },
-  model: { box: "border-ai-100/40 bg-ai-100/5", label: "text-ai-100" },
-  tool: { box: "border-compute-100/50 bg-compute-100/10", label: "text-compute-100" },
-  result: { box: "border-border-100 bg-background-300", label: "text-text-secondary" },
+/**
+ * Node-graph palette (DiagramNode.tone → token). Mirrors the Cloudflare
+ * marketing-site look: human/input = accent, the agent/worker = compute,
+ * model = ai, tools/state = media, terminal output = neutral foreground.
+ */
+export const NODE_TONE: Record<string, string> = {
+  user: "var(--color-accent-100)",
+  agent: "var(--color-compute-100)",
+  model: "var(--color-ai-100)",
+  tool: "var(--color-media-100)",
+  state: "var(--color-media-100)",
+  output: "var(--color-foreground-300)",
 };

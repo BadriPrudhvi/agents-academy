@@ -120,14 +120,19 @@ export const yourFirstAgent: Lesson = {
       text: "An *agent* is software that can **remember**, **decide**, and **act** toward a goal — not just answer one question. A plain chatbot replies and forgets. An agent keeps context, calls models and tools, and can pick up where it left off.",
     },
     {
-      kind: "agentFlow",
+      kind: "diagram",
       title: "The shape of every agent",
       caption: "The agent prompts a model and persists what it learns to memory.",
-      steps: [
-        { label: "You / a system", tone: "user", text: "Sends a request." },
-        { label: "Agent", tone: "model", text: "Receives it and decides what to do." },
-        { label: "Model (Workers AI)", tone: "tool", text: "The agent prompts the model." },
-        { label: "Memory (state)", tone: "result", text: "Persists state so it can remember." },
+      nodes: [
+        { id: "you", label: "You / system", tone: "user", icon: "person", x: 0, y: 80 },
+        { id: "agent", label: "Agent", tone: "agent", icon: "agent", x: 240, y: 80 },
+        { id: "model", label: "Model (AI)", tone: "model", icon: "sparkle", x: 480, y: 0 },
+        { id: "mem", label: "Memory", tone: "state", icon: "database", x: 480, y: 160 },
+      ],
+      edges: [
+        { from: "you", to: "agent" },
+        { from: "agent", to: "model", label: "prompt" },
+        { from: "agent", to: "mem", label: "remember" },
       ],
     },
     {

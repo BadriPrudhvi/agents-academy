@@ -61,14 +61,19 @@ export const reconcileTransactions: Lesson = {
       text: "You have two records of the same money — say **bank transactions** and your **ledger**. Reconciliation means: which entries match, and which don't? Agents are great at this because the rule is exact and the boring part (comparing every row) is just code.",
     },
     {
-      kind: "agentFlow",
+      kind: "diagram",
       title: "Reconcile two sources",
       caption: "Two data sources go in; only the exceptions come out.",
-      steps: [
-        { label: "Bank rows", tone: "tool", text: "First source of truth." },
-        { label: "Ledger rows", tone: "tool", text: "Second source of truth." },
-        { label: "Agent writes match code", tone: "model", text: "Matches by id and amount." },
-        { label: "Unmatched → review", tone: "result", text: "Only the exceptions need a human." },
+      nodes: [
+        { id: "bank", label: "Bank rows", tone: "tool", icon: "table", x: 0, y: 0 },
+        { id: "ledger", label: "Ledger rows", tone: "tool", icon: "table", x: 0, y: 160 },
+        { id: "agent", label: "Match code", tone: "agent", icon: "code", x: 240, y: 80 },
+        { id: "out", label: "Unmatched", tone: "output", icon: "eye", x: 480, y: 80 },
+      ],
+      edges: [
+        { from: "bank", to: "agent" },
+        { from: "ledger", to: "agent" },
+        { from: "agent", to: "out", label: "exceptions only" },
       ],
     },
     {

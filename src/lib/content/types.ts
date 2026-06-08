@@ -17,17 +17,28 @@
  */
 export type Audience = "concept" | "code";
 
-/** One step in a vertical agent-flow diagram (codemode-talk style): a colored,
- *  rounded box joined to the next by a downward arrow. */
-export interface FlowStep {
-  /** Small uppercase role label, e.g. "GOAL", "MODEL", "TOOL CALL". */
+/** A node in a horizontal node-graph diagram (Cloudflare marketing-site style):
+ *  a colour-coded box with a label above, an icon inside, and corner handles. */
+export interface DiagramNode {
+  id: string;
   label: string;
-  /** Colour role → token. */
-  tone?: "user" | "model" | "tool" | "result";
-  /** Optional plain-language line under the label. */
-  text?: string;
-  /** Optional monospace line — a tool call with args, or returned data. */
-  code?: string;
+  /** Colour role → token (see NODE_TONE). */
+  tone?: "user" | "agent" | "model" | "tool" | "state" | "output";
+  /** Top-left position in the diagram's coordinate space. */
+  x: number;
+  y: number;
+  /** Icon name drawn inside the box (see ICONS in NodeGraph). */
+  icon?: string;
+}
+
+/** A dashed connector between two nodes. */
+export interface DiagramEdge {
+  from: string;
+  to: string;
+  /** Optional label drawn at the connector's midpoint. */
+  label?: string;
+  /** Signed arc magnitude for a curved feedback/loop edge (0 = straight). */
+  curve?: number;
 }
 
 /** A unit of lesson body. Rendered by the article page block-by-block. */
@@ -37,15 +48,7 @@ export type Block = ({ audience?: Audience }) & (
   | { kind: "code"; lang: string; code: string; caption?: string }
   | { kind: "callout"; tone: "note" | "tip" | "warning"; title?: string; text: string }
   | { kind: "list"; ordered?: boolean; items: string[] }
-  | {
-      kind: "agentFlow";
-      title?: string;
-      caption?: string;
-      steps: FlowStep[];
-      /** Optional repeating range (inclusive step indices) drawn as a "loop"
-       *  group. `label` is the top chip; `note` is an optional bottom cue. */
-      loop?: { from: number; to: number; label?: string; note?: string };
-    } // vertical box-flow (codemode-talk style)
+  | { kind: "diagram"; title?: string; caption?: string; nodes: DiagramNode[]; edges: DiagramEdge[] } // horizontal node-graph
   | { kind: "analogy"; role: string; text: string } // role-tailored framing
   | { kind: "watch"; labId: string; caption?: string } // no-code "see it run" (runs the solution)
   | { kind: "agentStudio"; studioId: string } // unified: build + edit + AI codegen + run for real

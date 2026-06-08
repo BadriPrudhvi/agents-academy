@@ -93,17 +93,23 @@ export const agentHarness: Lesson = {
       text: "You already saw the agent loop — **decide → act → observe → answer**, repeating until done. In real apps you don't write that loop by hand. You either adopt an **opinionated harness** that runs it for you, or wire up the **AI SDK's loop yourself** when you need control. Cloudflare gives you both: **Think** and **AIChatAgent**.",
     },
     {
-      kind: "agentFlow",
+      kind: "diagram",
       title: "The loop a harness runs for you",
       caption:
         "Think runs this whole loop from a 3-line subclass. With AIChatAgent you wire the same loop yourself via streamText + stopWhen.",
-      loop: { from: 1, to: 3, label: "until the model is done", note: "↑ more tool calls? loop again" },
-      steps: [
-        { label: "Goal", tone: "user", text: "A user message" },
-        { label: "Model decides", tone: "model", text: "Answer now, or call a tool" },
-        { label: "Tool call", tone: "tool", code: "tool(args)" },
-        { label: "Reads the result", tone: "result", text: "Tool output feeds back to the model" },
-        { label: "Answers", tone: "model", text: "Streams the final reply" },
+      nodes: [
+        { id: "goal", label: "Goal", tone: "user", icon: "flag", x: 0, y: 80 },
+        { id: "decide", label: "Decides", tone: "model", icon: "brain", x: 230, y: 80 },
+        { id: "tool", label: "Tool call", tone: "tool", icon: "wrench", x: 460, y: 80 },
+        { id: "observe", label: "Reads result", tone: "output", icon: "eye", x: 690, y: 80 },
+        { id: "answer", label: "Answers", tone: "model", icon: "message", x: 920, y: 80 },
+      ],
+      edges: [
+        { from: "goal", to: "decide" },
+        { from: "decide", to: "tool" },
+        { from: "tool", to: "observe" },
+        { from: "observe", to: "answer" },
+        { from: "observe", to: "decide", label: "more tool calls? loop", curve: 110 },
       ],
     },
 

@@ -79,17 +79,23 @@ export const whatIsAnAgent: Lesson = {
       text: "An **AI agent** is a **model** (the brain) wired into a **loop** with **tools**. Given a goal, the model **decides** what to do, **calls a tool** to act or fetch data, **reads the result**, and repeats until it can **answer** — grounded in what it found. A plain chatbot just replies from memory; an agent decides, uses tools, and gets things done.",
     },
     {
-      kind: "agentFlow",
+      kind: "diagram",
       title: "The agent loop: decide → act → observe → answer",
       caption:
         "The middle three steps — decide, act, observe — repeat until the model has enough to answer. That loop, grounded in real data, is the agent.",
-      loop: { from: 1, to: 3, label: "repeats until it can answer", note: "↑ not done? back to decide" },
-      steps: [
-        { label: "Goal", tone: "user", text: "What you want done, in plain English" },
-        { label: "Model decides", tone: "model", text: "Reads the goal and picks the right tool" },
-        { label: "Tool call", tone: "tool", code: "tool(arguments)" },
-        { label: "Reads the result", tone: "result", code: "{ real data returned }" },
-        { label: "Model answers", tone: "model", text: "Replies, grounded in what it read" },
+      nodes: [
+        { id: "goal", label: "Goal", tone: "user", icon: "flag", x: 0, y: 80 },
+        { id: "decide", label: "Decides", tone: "model", icon: "brain", x: 230, y: 80 },
+        { id: "tool", label: "Tool call", tone: "tool", icon: "wrench", x: 460, y: 80 },
+        { id: "observe", label: "Reads result", tone: "output", icon: "eye", x: 690, y: 80 },
+        { id: "answer", label: "Answers", tone: "model", icon: "message", x: 920, y: 80 },
+      ],
+      edges: [
+        { from: "goal", to: "decide" },
+        { from: "decide", to: "tool" },
+        { from: "tool", to: "observe" },
+        { from: "observe", to: "answer" },
+        { from: "observe", to: "decide", label: "not done? repeat", curve: 110 },
       ],
     },
     {
