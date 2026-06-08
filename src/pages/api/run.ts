@@ -30,12 +30,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 
   // Hidden checks come from the server-side content, never from the client.
-  const mode = (locals as any)?.runtime?.env?.RUNNER_MODE as string | undefined;
-  const runner = getRunner(mode);
+  const env = (locals as any)?.runtime?.env;
+  const runner = getRunner(env?.RUNNER_MODE as string | undefined, env?.RUNNER);
 
   const result = await runner.run(
     { lessonSlug: parsed.lessonSlug, labId: parsed.labId, action: parsed.action, files: parsed.files },
-    { files: lab.files, checks: lab.challenge.checks },
+    { language: lab.language, runCmd: lab.runCmd, files: lab.files, checks: lab.challenge.checks },
   );
 
   return json(result, 200);

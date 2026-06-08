@@ -67,17 +67,34 @@ Lessons are typed objects (`src/lib/content/types.ts`) authored to a rubric
 invariant: the reference solution must pass all checks and the starter must fail at
 least one. (It already caught one real authoring bug — see git history.)
 
-## What's mocked vs. real (honest status)
+## What's real vs. mocked (honest status)
 
-| Piece | MVP status | Swap-point |
-| --- | --- | --- |
-| Design tokens / layout | Real (vendored) | Add Kumo + fonts in `global.css` |
-| Lesson loop (edit/run/grade) | Real logic, **simulated** stdout | `RUNNER_MODE=sandbox` |
-| Tutor | Real grounding from lesson content | `TUTOR_MODE=live` (Workers AI + AutoRAG) |
-| Progress | localStorage | D1-backed `/api/progress` |
+Deployed live via `--env production` (Workers Paid):
 
-## Provision checklist (to go live)
+| Piece | Status |
+| --- | --- |
+| Design tokens / layout | Real (vendored marketing-site tokens) |
+| Tutor | **Live** — Workers AI (`@cf/meta/llama-3.1-8b-instruct`), grounded in lesson content, plain-language + injection guardrails |
+| Python lab | **Real** — runs Python 3.11 in a `@cloudflare/sandbox` container |
+| Code Mode + reconcile labs | **Real** — run on Node in the container via a `codemode.*` harness |
+| Greeter lab | Labeled mock (a full `wrangler dev` server per click isn't practical) |
+| Progress | localStorage (D1 swap-point documented) |
 
-Workers Paid account; then enable & bind: Containers/Sandbox, Durable Objects, D1, KV,
-R2, Vectorize/AI Search, AI Gateway. Uncomment the bindings in `wrangler.jsonc`, set
-`account_id`, and flip `RUNNER_MODE`/`TUTOR_MODE` in `env.production`.
+Local dev (`astro dev`, top-level env) stays fully offline/mock so you can work without spend.
+
+## Architecture: two Workers
+
+- **`agents-academy`** — Astro SSR app + API (`/api/run`, `/api/tutor`). Tutor uses the `AI` binding; the runner is reached via a `RUNNER` **service binding**.
+- **`agents-academy-runner`** — owns the `@cloudflare/sandbox` container; not publicly routable. Executes Python/JS and returns real stdout.
+
+```bash
+# deploy the runner (uses the prebuilt python image; no local Docker build needed)
+npx wrangler deploy -c runner/wrangler.jsonc
+# deploy the app (live tutor + real execution)
+pnpm build && npx wrangler deploy --env production
+```
+
+> Note: this machine's Docker Desktop enforces an org sign-in that blocks local
+> image builds, so the runner references the prebuilt `cloudflare/sandbox:0.11.0-python`
+> image directly. To customize the container, build from `runner/Dockerfile` where
+> Docker builds are permitted.

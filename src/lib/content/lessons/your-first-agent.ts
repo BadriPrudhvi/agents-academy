@@ -250,14 +250,14 @@ export const yourFirstAgent: Lesson = {
       ],
       answerIndex: 1,
       explanation:
-        "Each agent is a Durable Object with its own embedded SQLite. State set via this.setState / this.sql persists with that instance — no external database, and not a Worker global (which is ephemeral and shared).",
+        "Each agent runs as a Durable Object — think of it as a single, always-there instance with its own small built-in database. State you save sticks with that instance, so there's no separate database to set up (and it's not a shared global variable, which would be wiped between requests).",
     },
   },
 
   recap: [
-    "An agent is a durable identity (a Durable Object), not just a prompt.",
-    "this.env exposes bindings; you called the AI binding with this.env.AI.run.",
-    "this.setState persisted memory across requests with no external database.",
+    "An agent is a long-lived helper with its own memory — not just a one-off prompt.",
+    "It calls the AI model through a binding: a ready-made connection to Workers AI.",
+    "Its memory is saved automatically between requests — no separate database to set up.",
   ],
   next: { slug: "streaming-chat", label: "Stream responses to a chat UI" },
 

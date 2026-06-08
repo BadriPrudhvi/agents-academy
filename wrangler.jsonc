@@ -54,8 +54,15 @@
     },
     "production": {
       "name": "agents-academy",
+      // Bindings + assets are NOT inherited from top-level — redeclare here.
+      "assets": { "binding": "ASSETS", "directory": "./dist" },
+      "workers_dev": true,
+      "preview_urls": false,
+      "observability": { "enabled": true },
+      // Live tutor + real container execution (python & JS labs) via the runner Worker.
       "vars": { "RUNNER_MODE": "sandbox", "TUTOR_MODE": "live" },
-      "ai": { "binding": "AI" }
+      "ai": { "binding": "AI" },
+      "services": [{ "binding": "RUNNER", "service": "agents-academy-runner" }]
     }
   }
 }

@@ -1,6 +1,5 @@
-import type { GradingCheck, LabFile } from "../content/types";
 import { grade, stripComments } from "./grade";
-import type { Runner, RunRequest, RunnerResponse } from "./types";
+import type { LabContext, Runner, RunRequest, RunnerResponse } from "./types";
 
 /**
  * Local mock runner — Spike B fallback.
@@ -57,14 +56,14 @@ const SIMULATORS: Record<string, Simulator> = {
     if (callsTool && aggregates) {
       return [
         "$ code-mode run task.js",
-        "→ executing generated code in V8 isolate (no secret access)",
+        "→ executing generated code in secure sandbox (no secret access)",
         "→ codemode.listSales() → 6 rows",
         "Top product: Widget A ($42,000)",
       ].join("\n");
     }
     return [
       "$ code-mode run task.js",
-      "→ executing generated code in V8 isolate",
+      "→ executing generated code in secure sandbox",
       callsTool ? "(got rows, but nothing aggregated yet)" : "(no codemode.listSales() call yet)",
     ].join("\n");
   },
@@ -118,10 +117,7 @@ function genericSimulate(files: { path: string; contents: string }[]): string {
 
 export const mockRunner: Runner = {
   engine: "mock",
-  async run(
-    req: RunRequest,
-    lab: { files: LabFile[]; checks: GradingCheck[] },
-  ): Promise<RunnerResponse> {
+  async run(req: RunRequest, lab: LabContext): Promise<RunnerResponse> {
     const started = Date.now();
     const sim = SIMULATORS[req.labId] ?? genericSimulate;
     const output = sim(req.files);

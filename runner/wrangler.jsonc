@@ -1,0 +1,24 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "agents-academy-runner",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-05-25",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  // Not publicly routable — reached only via the Astro Worker's service binding.
+  "workers_dev": false,
+  "preview_urls": false,
+  "containers": [
+    {
+      "class_name": "Sandbox",
+      // -python variant: includes python3 + numpy/pandas/matplotlib for data labs.
+      "image": "docker.io/cloudflare/sandbox:0.11.0-python",
+      "instance_type": "lite",
+      "max_instances": 3
+    }
+  ],
+  "durable_objects": {
+    "bindings": [{ "class_name": "Sandbox", "name": "Sandbox" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Sandbox"] }]
+}

@@ -85,7 +85,7 @@ export const financeReconciliation: Lesson = {
       kind: "callout",
       tone: "warning",
       title: "Exact, not approximate",
-      text: "Never let a model 'judge' whether numbers match. The agent compares id + amount in code, so results are deterministic and auditable.",
+      text: "Never let a model 'judge' whether numbers match. The agent compares id + amount in code, so the result is exact, the same every time, and easy to audit.",
     },
 
     { kind: "heading", text: "What the agent does", id: "does", audience: "concept" },
@@ -163,8 +163,8 @@ export const financeReconciliation: Lesson = {
   },
 
   recap: [
-    "Reconciliation = match two sources on an exact key, surface the exceptions.",
-    "The agent writes deterministic match code; the model never guesses the numbers.",
+    "Reconciliation = match two sources on an exact key, then surface the exceptions.",
+    "The agent writes exact match code (the same answer every time); the model never guesses the numbers.",
     "You flagged unmatched transactions from two tools in a few lines.",
   ],
 

@@ -63,11 +63,11 @@ async function lintLesson(l: Lesson) {
 
     const sol = await mockRunner.run(
       { lessonSlug: l.slug, labId: lab.id, action: "check", files: solutionFiles },
-      { files: lab.files, checks: lab.challenge.checks },
+      { language: lab.language, runCmd: lab.runCmd, files: lab.files, checks: lab.challenge.checks },
     );
     const start = await mockRunner.run(
       { lessonSlug: l.slug, labId: lab.id, action: "check", files: starterFiles },
-      { files: lab.files, checks: lab.challenge.checks },
+      { language: lab.language, runCmd: lab.runCmd, files: lab.files, checks: lab.challenge.checks },
     );
 
     if (!sol.grade?.passed) fail(l.slug, `lab '${lab.id}': reference solution does NOT pass all checks`);

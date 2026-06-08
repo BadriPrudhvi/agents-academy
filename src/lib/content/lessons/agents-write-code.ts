@@ -67,7 +67,7 @@ export const agentsWriteCode: Lesson = {
       title: "Many tools vs. Code Mode",
       nodes: [
         { id: "agent", label: "Agent", tone: "agent", x: 0, y: 110 },
-        { id: "code", label: "code tool (V8 isolate)", tone: "tool", x: 220, y: 110 },
+        { id: "code", label: "code (secure sandbox)", tone: "tool", x: 220, y: 110 },
         { id: "a", label: "codemode.listSales()", tone: "model", x: 470, y: 30 },
         { id: "b", label: "codemode.getCosts()", tone: "model", x: 470, y: 190 },
       ],
@@ -93,7 +93,7 @@ export const agentsWriteCode: Lesson = {
       kind: "callout",
       tone: "note",
       title: "Why this matters for scale",
-      text: "Context stays fixed no matter how many APIs you expose — the model writes code against typed methods instead of reading 50 tool definitions.",
+      text: "The model writes a few lines of code instead of reading dozens of separate tool descriptions — so it stays fast and focused no matter how many APIs you add.",
     },
 
     { kind: "heading", text: "What the code does", id: "does", audience: "concept" },

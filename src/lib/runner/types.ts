@@ -35,7 +35,14 @@ export interface RunnerResponse {
   grade?: GradeResult;
 }
 
+export interface LabContext {
+  language: "typescript" | "javascript" | "python";
+  runCmd: string;
+  files: LabFile[];
+  checks: GradingCheck[];
+}
+
 export interface Runner {
   engine: "mock" | "sandbox";
-  run(req: RunRequest, lab: { files: LabFile[]; checks: GradingCheck[] }): Promise<RunnerResponse>;
+  run(req: RunRequest, lab: LabContext): Promise<RunnerResponse>;
 }
