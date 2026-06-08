@@ -36,6 +36,35 @@ const calloutTone: Record<string, string> = {
     <h2 id={b.id ?? slugify(b.text)} class="mt-10 scroll-mt-20 text-2xl">{b.text}</h2>
   )}
   {b.kind === "prose" && <p class="mt-4 leading-relaxed text-foreground-200" set:html={inline(b.text)} />}
+  {b.kind === "statement" && (
+    <div class="my-10 text-center">
+      <p
+        class="mx-auto max-w-2xl text-balance text-2xl font-medium leading-tight md:text-3xl [&_strong]:font-medium [&_strong]:text-accent-muted"
+        set:html={inline(b.text)}
+      />
+      {b.sub && <p class="mx-auto mt-3 max-w-xl text-foreground-200" set:html={inline(b.sub)} />}
+    </div>
+  )}
+  {b.kind === "compare" && (
+    <div class="my-8 grid gap-4 sm:grid-cols-2">
+      <div class="rounded-xl border border-border-100 bg-background-200 p-5">
+        <p class="mb-3 font-medium text-foreground-100">{b.left.title}</p>
+        <ul class="space-y-2 text-sm text-foreground-200">
+          {b.left.items.map((it) => (
+            <li class="flex items-start gap-2"><span class="mt-0.5 text-accent-muted">✕</span><span set:html={inline(it)} /></li>
+          ))}
+        </ul>
+      </div>
+      <div class="rounded-xl border border-accent-100 bg-background-content p-5">
+        <p class="mb-3 font-medium text-foreground-100">{b.right.title}</p>
+        <ul class="space-y-2 text-sm text-foreground-200">
+          {b.right.items.map((it) => (
+            <li class="flex items-start gap-2"><span class="mt-0.5 text-ai-100">✓</span><span set:html={inline(it)} /></li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  )}
   {b.kind === "list" && (
     <ul class={`mt-4 space-y-1.5 pl-5 text-foreground-200 ${b.ordered ? "list-decimal" : "list-disc"}`}>
       {b.items.map((it) => <li set:html={inline(it)} />)}

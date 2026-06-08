@@ -40,6 +40,14 @@ async function lintLesson(l: Lesson) {
     if (b.kind === "agentRun" && !l.agentRuns?.[b.runId]) fail(l.slug, `agentRun references missing agentRun '${b.runId}'`);
     if (b.kind === "streamChat" && !l.streamChats?.[b.chatId]) fail(l.slug, `streamChat references missing streamChat '${b.chatId}'`);
     if (b.kind === "quiz" && !l.quizzes[b.quizId]) fail(l.slug, `quiz references missing quiz '${b.quizId}'`);
+    if (b.kind === "statement" && !b.text.trim()) fail(l.slug, "statement block has empty text");
+    if (b.kind === "compare") {
+      for (const side of ["left", "right"] as const) {
+        const pane = b[side];
+        if (!pane.title.trim()) fail(l.slug, `compare block '${side}' pane missing title`);
+        if (pane.items.length < 1) fail(l.slug, `compare block '${side}' pane needs ≥1 item`);
+      }
+    }
   }
 
   // ── AgentStudio integrity (unified build + run interactive) ──
@@ -58,8 +66,8 @@ async function lintLesson(l: Lesson) {
   }
 
   // ── AgentRun integrity (real model+tools loop) ──
+  // intro is optional — the lead line can live in the lesson body instead.
   for (const run of Object.values(l.agentRuns ?? {})) {
-    if (!run.intro.trim()) fail(l.slug, `agentRun '${run.id}' missing intro`);
     if (!run.model.trim()) fail(l.slug, `agentRun '${run.id}' missing model`);
     if (run.tools.length < 1) fail(l.slug, `agentRun '${run.id}' needs at least one tool`);
     if (run.examples.length < 1) fail(l.slug, `agentRun '${run.id}' needs at least one example goal`);

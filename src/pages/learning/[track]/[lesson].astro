@@ -2,7 +2,7 @@
 import Base from "../../../layouts/Base.astro";
 import { getLesson, getTrack } from "../../../lib/content";
 import { highlight } from "../../../lib/highlight";
-import { slugify } from "../../../lib/content/inline";
+import { slugify, inline } from "../../../lib/content/inline";
 import BlockRenderer from "../../../components/content/BlockRenderer.astro";
 import TutorPanel from "../../../components/interactive/tutor/TutorPanel.tsx";
 import LessonProgress from "../../../components/interactive/LessonProgress.tsx";
@@ -42,8 +42,15 @@ const toc = lesson.blocks
         {track.title} · Lesson {lesson.order}
       </span>
       <h1 class="mt-2 text-3xl md:text-4xl">{lesson.title}</h1>
-      <p class="mt-3 max-w-2xl text-lg text-foreground-200">{lesson.summary}</p>
-      <div class="mt-4 flex flex-wrap items-center justify-between gap-4">
+      {lesson.bigIdea ? (
+        <p
+          class="mt-3 max-w-2xl text-lg text-foreground-100 [&_strong]:font-medium [&_strong]:text-accent-muted"
+          set:html={inline(lesson.bigIdea)}
+        />
+      ) : (
+        <p class="mt-3 max-w-2xl text-lg text-foreground-200">{lesson.summary}</p>
+      )}
+      <div class="mt-5 flex flex-wrap items-center justify-between gap-4">
         <div class="flex flex-wrap items-center gap-4 text-sm text-text-secondary">
           <span class="inline-flex items-center gap-1.5"><Clock size={14} /> {lesson.timeEstimateMin} min</span>
           <span class="inline-flex items-center gap-1.5"><Target size={14} /> {lesson.competencies.length} skills</span>
@@ -55,24 +62,19 @@ const toc = lesson.blocks
     <div class="mt-8 grid gap-10 lg:grid-cols-[1fr_16rem]">
       {/* Body */}
       <div class="min-w-0" id="lesson-body" data-view="concept">
-        {/* Why it matters + outcomes — light, no box */}
-        <div class="mb-10 border-l-2 border-border-200 pl-4">
-          <p class="text-foreground-200"><strong class="text-foreground-100">Why this matters.</strong> {lesson.whyItMatters}</p>
-          <p class="mt-3 text-[11px] uppercase tracking-wider text-text-secondary">By the end you can</p>
-          <ul class="mt-1.5 list-disc space-y-1 pl-5 text-sm text-foreground-200">
-            {lesson.outcomes.map((o) => <li>{o}</li>)}
-          </ul>
-        </div>
-
         {lesson.blocks.map((b, i) => (
           <BlockRenderer lesson={lesson} block={b} index={i} codeHtml={codeHtml.get(i)} />
         ))}
 
-        {/* Recap + next */}
+        {/* Recap + outcomes + next */}
         <div class="mt-12 border-t border-border-100 pt-6">
           <h2 class="text-xl">Recap</h2>
           <ul class="mt-2 list-disc space-y-1 pl-5 text-foreground-200">
             {lesson.recap.map((r) => <li>{r}</li>)}
+          </ul>
+          <p class="mt-5 text-[11px] uppercase tracking-wider text-text-secondary">What you can now do</p>
+          <ul class="mt-1.5 list-disc space-y-1 pl-5 text-sm text-foreground-200">
+            {lesson.outcomes.map((o) => <li>{o}</li>)}
           </ul>
         </div>
         <div class="mt-4 flex flex-wrap items-center gap-3">

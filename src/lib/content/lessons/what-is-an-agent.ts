@@ -48,6 +48,7 @@ export const whatIsAnAgent: Lesson = {
   title: "What is an AI agent?",
   summary:
     "Start here. Understand what makes software an 'agent' — in plain language — then build one and run it for real, with or without code.",
+  bigIdea: "An agent is a model in a **loop** with tools — it decides, acts, and repeats until it can answer.",
 
   outcomes: [
     "Say what an AI agent is in one sentence.",
@@ -73,16 +74,27 @@ export const whatIsAnAgent: Lesson = {
   ],
 
   blocks: [
-    { kind: "heading", text: "What makes something an agent?", id: "what" },
+    { kind: "heading", text: "Agent vs. chatbot", id: "what" },
     {
       kind: "prose",
-      text: "An **AI agent** is a **model** (the brain) wired into a **loop** with **tools**. Given a goal, the model **decides** what to do, **calls a tool** to act or fetch data, **reads the result**, and repeats until it can **answer** — grounded in what it found. A plain chatbot just replies from memory; an agent decides, uses tools, and gets things done.",
+      text: "A chatbot replies once from memory. An agent keeps going — using tools and real data to reach a goal.",
     },
     {
+      kind: "compare",
+      left: {
+        title: "Chatbot",
+        items: ["Replies from memory", "One shot, then forgets", "Guesses when it's unsure"],
+      },
+      right: {
+        title: "Agent",
+        items: ["Uses tools and real data", "Remembers across steps", "Decides what to do next", "Works toward a goal"],
+      },
+    },
+
+    { kind: "statement", text: "Every agent runs the same **loop**.", sub: "decide → act → observe → answer" },
+    {
       kind: "diagram",
-      title: "The agent loop: decide → act → observe → answer",
-      caption:
-        "The middle three steps — decide, act, observe — repeat until the model has enough to answer. That loop, grounded in real data, is the agent.",
+      title: "The agent loop",
       nodes: [
         { id: "goal", label: "Goal", tone: "user", icon: "flag", x: 0, y: 80 },
         { id: "decide", label: "Decides", tone: "model", icon: "brain", x: 230, y: 80 },
@@ -102,32 +114,20 @@ export const whatIsAnAgent: Lesson = {
       kind: "analogy",
       role: "Data analyst",
       audience: "concept",
-      text: "Think of a very capable junior analyst: you say 'find the top-selling product this quarter', and they pull the data, do the math, and hand you the answer — instead of you writing the query yourself.",
-    },
-    {
-      kind: "analogy",
-      role: "Finance",
-      audience: "concept",
-      text: "Like an assistant who knows where every figure lives: ask 'which invoices didn't reconcile?' and they fetch both ledgers, compare them, and return just the exceptions.",
-    },
-    {
-      kind: "callout",
-      tone: "note",
-      title: "The one-sentence version",
-      text: "An agent is software that remembers, decides, and acts toward a goal — using tools and data along the way.",
+      text: "Like a capable junior analyst: you say “find the top product this quarter,” and they pull the data, do the math, and hand you the answer.",
     },
 
     { kind: "heading", text: "Watch a real agent work", id: "agent" },
     {
       kind: "prose",
       audience: "concept",
-      text: "Here is an actual agent — a **model** with two **tools** (`getSales` and `getSalesByRegion`). Give it a goal in plain English and watch the loop: it **decides** which tool fits, **calls** it (you'll see the arguments it picked), **reads** the real rows that come back, and **answers** from them. Decide → act → observe → answer. Notice it never guesses the numbers; it fetches them.",
+      text: "Give it a goal and watch the loop run — it picks a tool, reads the real rows, and answers from them.",
     },
     { kind: "agentRun", runId: "sales", audience: "concept" },
     {
       kind: "prose",
       audience: "code",
-      text: "Prefer code? Below is the agent's tool surface as an editable program. Edit it, ask the AI to extend it, and **Run in Sandbox** for real. In Track 1 you'll wrap this exact pattern — model + tools + loop — in the Agents SDK `Agent` class.",
+      text: "Prefer code? Here's the same agent as an editable program. Extend it, ask the AI, then **Run in Sandbox** for real.",
     },
     { kind: "agentStudio", studioId: "sales", audience: "code" },
 
@@ -172,7 +172,7 @@ export const whatIsAnAgent: Lesson = {
   agentRuns: {
     sales: {
       id: "sales",
-      intro: "A real agent: a model with two tools. Give it a goal — it decides which tool to call, reads the real data, and answers from it.",
+      intro: "",
       model: "GLM-4.7-Flash (Workers AI)",
       tools: [
         { name: "getSales", description: "Returns every sales record (product, region, revenue)." },

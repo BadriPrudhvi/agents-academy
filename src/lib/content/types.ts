@@ -41,10 +41,18 @@ export interface DiagramEdge {
   curve?: number;
 }
 
+/** One column of a `compare` block. The mark (× / ✓) is chosen by side. */
+export interface ComparePane {
+  title: string;
+  items: string[];
+}
+
 /** A unit of lesson body. Rendered by the article page block-by-block. */
 export type Block = ({ audience?: Audience }) & (
   | { kind: "prose"; text: string }
   | { kind: "heading"; text: string; id?: string }
+  | { kind: "statement"; text: string; sub?: string } // big one-idea headline; **word** renders in the accent colour
+  | { kind: "compare"; left: ComparePane; right: ComparePane } // two-column ×/✓ contrast
   | { kind: "code"; lang: string; code: string; caption?: string }
   | { kind: "callout"; tone: "note" | "tip" | "warning"; title?: string; text: string }
   | { kind: "list"; ordered?: boolean; items: string[] }
@@ -184,6 +192,9 @@ export interface Lesson {
   order: number;
   title: string;
   summary: string;
+  /** One punchy, plain-language sentence shown in the hero. `**word**` renders
+   *  in the accent colour. The big idea the whole lesson hangs on. */
+  bigIdea?: string;
 
   /* ── Rubric metadata ── */
   outcomes: string[]; // "After this you can…"

@@ -116,12 +116,18 @@ export default function AgentRun(props: Props) {
 
   const answered = trace?.some((s) => s.type === "answer");
   const toolSteps = (trace ?? []).filter((s): s is Extract<Step, { type: "tool" }> => s.type === "tool");
+  // Concrete payoff numbers from THIS run — make the loop's value tangible
+  // (inspired by codemode-talk's "2 tools · 20 endpoints · ~1,000 tokens" footer).
+  const rowsRead = (trace ?? []).reduce(
+    (n, s) => (s.type === "observe" && Array.isArray(s.data) ? n + s.data.length : n),
+    0,
+  );
 
   return (
     <section className="my-8 rounded-xl border border-border-100 bg-background-content">
       <div className="border-b border-border-100 px-5 py-4">
-        <p className="text-sm text-foreground-200">{props.intro}</p>
-        <p className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-text-secondary">
+        {props.intro && <p className="text-sm text-foreground-200">{props.intro}</p>}
+        <p className={`flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-text-secondary ${props.intro ? "mt-2" : ""}`}>
           <span className="inline-flex items-center gap-1.5"><Cpu size={13} /> Brain: {props.model}</span>
           <span className="inline-flex items-center gap-1.5">
             <Wrench size={13} /> Tools: {props.tools.map((t) => t.name).join(", ")}
@@ -213,10 +219,22 @@ export default function AgentRun(props: Props) {
         )}
 
         {answered && !busy && (
-          <p className="mt-1 rounded-md border border-border-100 bg-background-300 px-3 py-2 text-xs text-text-secondary">
-            A plain chatbot would answer from memory — and might guess. This agent <strong>chose a tool</strong>, read the
-            <strong> real rows</strong>, then answered from them. That decide → act → observe → answer loop is the difference.
-          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1.5 rounded-md border border-border-100 bg-background-300 px-3 py-2 text-xs text-text-secondary">
+            <span className="inline-flex items-center gap-1.5">
+              <Wrench size={12} className="text-compute-100" />
+              <strong className="font-medium text-foreground-200">{toolSteps.length} tool call{toolSteps.length === 1 ? "" : "s"}</strong> — chosen by the model
+            </span>
+            {rowsRead > 0 && (
+              <span className="inline-flex items-center gap-1.5">
+                <Eye size={12} className="text-ai-100" />
+                <strong className="font-medium text-foreground-200">{rowsRead} real rows</strong> — read, not guessed
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1.5">
+              <CheckCircle size={12} className="text-ai-100" />
+              <strong className="font-medium text-foreground-200">grounded answer</strong> — from the data above
+            </span>
+          </div>
         )}
 
         <div className="mt-5 border-t border-border-100 pt-4">
