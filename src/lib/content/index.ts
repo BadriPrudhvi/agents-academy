@@ -3,12 +3,13 @@ import { TRACKS, getTrack } from "./tracks";
 import { yourFirstAgent } from "./lessons/your-first-agent";
 import { agentsWriteCode } from "./lessons/agents-write-code";
 import { firstDataAgent } from "./lessons/first-data-agent";
+import { financeReconciliation } from "./lessons/finance-reconciliation";
 
 export type { Lesson, Track } from "./types";
 export { TRACKS, getTrack };
 
 /** Fully authored, runnable lessons. */
-const LESSONS: Lesson[] = [yourFirstAgent, agentsWriteCode, firstDataAgent];
+const LESSONS: Lesson[] = [yourFirstAgent, agentsWriteCode, firstDataAgent, financeReconciliation];
 
 /** Lightweight card for the hub (authored lessons + "coming soon" placeholders). */
 export interface LessonCard {

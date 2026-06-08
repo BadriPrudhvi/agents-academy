@@ -150,7 +150,7 @@ const calloutTone: Record<string, string> = {
         </div>
         <div class="mt-4 flex flex-wrap items-center gap-3">
           <LessonProgress client:idle slug={lesson.slug} />
-          {lesson.next && (
+          {lesson.next && getLesson(lesson.next.slug) && (
             <a href={`/learning/${lesson.trackId}/${lesson.next.slug}`} class="inline-flex items-center gap-2 rounded-md border border-border-100 px-4 py-2.5 text-sm hover:border-accent-100">
               Next: {lesson.next.label} →
             </a>

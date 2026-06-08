@@ -69,6 +69,26 @@ const SIMULATORS: Record<string, Simulator> = {
     ].join("\n");
   },
 
+  // Lesson: finance-reconciliation / lab: reconcile
+  reconcile(files) {
+    const src = stripComments(files.find((f) => f.path === "task.js")?.contents ?? "");
+    const callsBank = src.includes("codemode.bankRows");
+    const callsLedger = src.includes("codemode.ledgerRows");
+
+    if (callsBank && callsLedger) {
+      return [
+        "$ code-mode run task.js",
+        "→ codemode.bankRows() → 8 rows",
+        "→ codemode.ledgerRows() → 7 rows",
+        "Unmatched: 2 (TXN-0042, TXN-0099)",
+      ].join("\n");
+    }
+    return [
+      "$ code-mode run task.js",
+      !callsBank ? "(bank rows not loaded yet)" : "(ledger rows not loaded yet)",
+    ].join("\n");
+  },
+
   // Lesson: first-data-agent / lab: python-summary
   "python-summary"(files) {
     const raw = files.find((f) => f.path === "analyze.py")?.contents ?? "";

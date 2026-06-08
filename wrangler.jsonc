@@ -9,6 +9,9 @@
     "binding": "ASSETS",
     "directory": "./dist"
   },
+  // Keep the public *.workers.dev URL live (set false once a custom domain is mapped).
+  "workers_dev": true,
+  "preview_urls": false,
   "observability": {
     "enabled": true
   },
