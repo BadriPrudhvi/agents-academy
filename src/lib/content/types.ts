@@ -17,21 +17,6 @@
  */
 export type Audience = "concept" | "code";
 
-/** Simple agent-architecture diagram node/edge (rendered as a static SVG). */
-export interface DiagramNode {
-  id: string;
-  label: string;
-  /** Visual role -> color token. */
-  tone?: "user" | "agent" | "model" | "tool" | "state" | "output";
-  x: number;
-  y: number;
-}
-export interface DiagramEdge {
-  from: string;
-  to: string;
-  label?: string;
-}
-
 /** One step in a vertical agent-flow diagram (codemode-talk style): a colored,
  *  rounded box joined to the next by a downward arrow. */
 export interface FlowStep {
@@ -52,7 +37,6 @@ export type Block = ({ audience?: Audience }) & (
   | { kind: "code"; lang: string; code: string; caption?: string }
   | { kind: "callout"; tone: "note" | "tip" | "warning"; title?: string; text: string }
   | { kind: "list"; ordered?: boolean; items: string[] }
-  | { kind: "diagram"; title?: string; nodes: DiagramNode[]; edges: DiagramEdge[] }
   | {
       kind: "agentFlow";
       title?: string;

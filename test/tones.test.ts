@@ -5,11 +5,9 @@ describe("TONE_VAR palette", () => {
   it("maps each semantic tone to its exact CSS variable (locks diagram/run colours)", () => {
     expect(TONE_VAR).toEqual({
       foreground: "var(--color-foreground-300)",
-      accent: "var(--color-accent-100)",
       ai: "var(--color-ai-100)",
       compute: "var(--color-compute-100)",
       media: "var(--color-media-100)",
-      muted: "var(--color-text-secondary)",
     });
   });
 });

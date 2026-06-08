@@ -2,7 +2,6 @@
 import { roleIdFromLabel } from "../../lib/roles";
 import { inline, slugify } from "../../lib/content/inline";
 import type { Block, Lesson } from "../../lib/content/types";
-import AgentDiagram from "../interactive/AgentDiagram.tsx";
 import FlowDiagram from "../interactive/FlowDiagram.tsx";
 import WatchItRun from "../interactive/WatchItRun.tsx";
 import AgentRun from "../interactive/AgentRun.tsx";
@@ -59,9 +58,6 @@ const calloutTone: Record<string, string> = {
       <div class="overflow-x-auto rounded-lg border border-border-100 text-[13px] [&_pre]:m-0 [&_pre]:p-4" set:html={codeHtml} />
       {b.caption && <figcaption class="mt-1.5 font-mono text-xs text-text-secondary">{b.caption}</figcaption>}
     </figure>
-  )}
-  {b.kind === "diagram" && (
-    <AgentDiagram client:visible title={b.title} nodes={b.nodes} edges={b.edges} />
   )}
   {b.kind === "agentFlow" && (
     <FlowDiagram client:visible title={b.title} caption={b.caption} steps={b.steps} loop={b.loop} />

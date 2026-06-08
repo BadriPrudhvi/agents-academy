@@ -63,18 +63,13 @@ export const agentsWriteCode: Lesson = {
       text: "Most agents get a list of tools and call them one at a time. **Code Mode** flips this: the agent gets a single tool — *write code* — and each of your APIs appears as a typed `codemode.*` method it can call, loop over, and combine.",
     },
     {
-      kind: "diagram",
+      kind: "agentFlow",
       title: "Many tools vs. Code Mode",
-      nodes: [
-        { id: "agent", label: "Agent", tone: "agent", x: 0, y: 110 },
-        { id: "code", label: "code (secure sandbox)", tone: "tool", x: 220, y: 110 },
-        { id: "a", label: "codemode.listSales()", tone: "model", x: 470, y: 30 },
-        { id: "b", label: "codemode.getCosts()", tone: "model", x: 470, y: 190 },
-      ],
-      edges: [
-        { from: "agent", to: "code", label: "writes code" },
-        { from: "code", to: "a" },
-        { from: "code", to: "b" },
+      caption: "One block of code calls many tools — instead of one tool call per turn.",
+      steps: [
+        { label: "Agent", tone: "model", text: "Writes one block of code." },
+        { label: "code (secure sandbox)", tone: "tool", text: "Runs in a secure sandbox." },
+        { label: "Reads many tools", tone: "result", code: "codemode.listSales(); codemode.getCosts()" },
       ],
     },
     {

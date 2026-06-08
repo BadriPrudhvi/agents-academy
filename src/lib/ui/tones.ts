@@ -1,11 +1,10 @@
 /**
- * Single source for the agent-role colour language used across the diagrams and
- * the live run trace. Two representations live here because they serve two
- * rendering paths:
+ * Single source for the agent-role colour language used by the diagrams and the
+ * live run trace. Two representations live here because they serve two rendering
+ * paths:
  *
  *  - TONE_VAR    — CSS custom-property references, used where colour is applied
- *                  as an inline `fill`/`stroke`/`color` (SVG AgentDiagram, the
- *                  AgentRun step trace).
+ *                  as an inline `color` (the AgentRun step trace).
  *  - FLOW_VARIANT — Tailwind utility-class pairs, used by the vertical
  *                  FlowDiagram boxes (border + background, and the label colour).
  *
@@ -16,13 +15,9 @@
 /** Semantic palette as CSS custom-property references. */
 export const TONE_VAR = {
   foreground: "var(--color-foreground-300)",
-  accent: "var(--color-accent-100)",
   ai: "var(--color-ai-100)",
   compute: "var(--color-compute-100)",
   media: "var(--color-media-100)",
-  /** Muted neutral for terminal output/result nodes (mirrors FlowDiagram's
-   *  `result` tone), so outputs no longer borrow the `state`/memory colour. */
-  muted: "var(--color-text-secondary)",
 } as const;
 
 /** Tailwind class pairs for the FlowDiagram boxes (border+bg / label colour). */

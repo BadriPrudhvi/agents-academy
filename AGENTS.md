@@ -29,6 +29,6 @@ Only deploy when the critic pass is clean. Never deploy on a hunch.
 - Do **not** commit unless explicitly asked.
 - Local `astro dev` is offline/mock; live Workers AI + Sandbox only run in the
   deployed `production` env.
-- Diagrams: linear/sequential flows use the `agentFlow` block (FlowDiagram,
-  codemode-talk style); branching architecture diagrams use the `diagram` block
-  (AgentDiagram SVG).
+- Diagrams: all diagrams use the `agentFlow` block (FlowDiagram, codemode-talk
+  vertical box-flow) for one consistent visual language. The old SVG node-graph
+  (`diagram` block / AgentDiagram) was removed.

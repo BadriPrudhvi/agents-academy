@@ -40,20 +40,6 @@ async function lintLesson(l: Lesson) {
     if (b.kind === "agentRun" && !l.agentRuns?.[b.runId]) fail(l.slug, `agentRun references missing agentRun '${b.runId}'`);
     if (b.kind === "streamChat" && !l.streamChats?.[b.chatId]) fail(l.slug, `streamChat references missing streamChat '${b.chatId}'`);
     if (b.kind === "quiz" && !l.quizzes[b.quizId]) fail(l.slug, `quiz references missing quiz '${b.quizId}'`);
-
-    // Tone semantics: the "state" tone is reserved for memory/state nodes. A
-    // terminal output/result that wants a muted colour should use "output",
-    // not borrow the state (purple) colour. Keeps the diagram palette honest.
-    if (b.kind === "diagram") {
-      for (const n of b.nodes) {
-        if (n.tone === "state" && !/state|memory/i.test(n.label)) {
-          fail(
-            l.slug,
-            `diagram node '${n.label}' uses tone "state" but isn't a memory/state node — use tone "output" for results`,
-          );
-        }
-      }
-    }
   }
 
   // ── AgentStudio integrity (unified build + run interactive) ──
