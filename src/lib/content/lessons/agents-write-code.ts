@@ -32,6 +32,7 @@ export const agentsWriteCode: Lesson = {
   title: "Agents that write code (Code Mode)",
   summary:
     "Instead of wiring dozens of tools into a prompt, give the agent one tool: write code that calls your APIs as typed methods.",
+  bigIdea: "Don't describe 50 tools — give the agent **one** tool: write code.",
 
   outcomes: [
     "Explain Code Mode and why it scales better than many separate tools.",
@@ -60,12 +61,30 @@ export const agentsWriteCode: Lesson = {
     { kind: "heading", text: "One tool to rule them all", id: "idea" },
     {
       kind: "prose",
-      text: "Most agents get a list of tools and call them one at a time. **Code Mode** flips this: the agent gets a single tool — *write code* — and each of your APIs appears as a typed `codemode.*` method it can call, loop over, and combine.",
+      text: "Most agents get a list of tools and call them one at a time. Code Mode flips it: one tool — *write code* — and each API is a typed `codemode.*` method it can call, loop over, and combine.",
+    },
+    {
+      kind: "compare",
+      left: {
+        title: "Many tools",
+        items: ["Thousands of tool definitions", "Repeated back-and-forth", "Context bloat"],
+      },
+      right: {
+        title: "Code Mode",
+        items: ["One typed API", "Generated code", "One execution"],
+      },
+    },
+    {
+      kind: "stat",
+      items: [
+        { value: "2,594", label: "Cloudflare API endpoints", tone: "foreground" },
+        { value: "2 tools", label: "search + execute", tone: "ai" },
+        { value: "99.9%", label: "less context vs naive MCP", tone: "accent" },
+      ],
     },
     {
       kind: "diagram",
       title: "Many tools vs. Code Mode",
-      caption: "One block of code calls many tools — instead of one tool call per turn.",
       nodes: [
         { id: "agent", label: "Agent", tone: "agent", icon: "agent", x: 0, y: 80 },
         { id: "code", label: "code (sandbox)", tone: "tool", icon: "code", x: 240, y: 80 },
@@ -82,19 +101,7 @@ export const agentsWriteCode: Lesson = {
       kind: "analogy",
       role: "Data analyst",
       audience: "concept",
-      text: "It's the difference between clicking one menu item at a time vs. writing a single formula that pulls, filters, and totals across sheets in one go. The agent writes that formula for you.",
-    },
-    {
-      kind: "analogy",
-      role: "Data scientist",
-      audience: "concept",
-      text: "Like handing the model a notebook with your data SDK pre-imported: it writes a cell that chains calls and returns the answer, instead of you exposing every endpoint as a separate function.",
-    },
-    {
-      kind: "callout",
-      tone: "note",
-      title: "Why this matters for scale",
-      text: "The model writes a few lines of code instead of reading dozens of separate tool descriptions — so it stays fast and focused no matter how many APIs you add.",
+      text: "Like writing one formula that pulls, filters, and totals across sheets — instead of clicking one menu item at a time. The agent writes that formula for you.",
     },
 
     { kind: "heading", text: "What the code does", id: "does", audience: "concept" },
@@ -111,19 +118,19 @@ export const agentsWriteCode: Lesson = {
       kind: "watch",
       labId: "codemode-sales",
       audience: "concept",
-      caption: "No code needed — run the finished Code Mode task and see the top product it computes.",
+      caption: "No code needed — run the finished task and see the top product it computes.",
     },
     {
       kind: "prose",
       audience: "concept",
-      text: "Switch to **Code** view to write it yourself — it's about six lines.",
+      text: "Switch to **Code** to write it yourself — about six lines.",
     },
 
     { kind: "heading", text: "Write a Code Mode task", id: "build", audience: "code" },
     {
       kind: "prose",
       audience: "code",
-      text: "You're given one tool: `codemode.listSales()`. Compose the answer in code — total revenue per product and print the top one. Press **Run**, then **Check**.",
+      text: "One tool: `codemode.listSales()`. Compose the answer in code — total revenue per product, print the top one. **Run**, then **Check**.",
     },
     { kind: "codelab", labId: "codemode-sales", audience: "code" },
 
