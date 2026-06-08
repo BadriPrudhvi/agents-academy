@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import type { DiagramEdge, DiagramNode } from "@/lib/content/types";
 
 const TONE: Record<string, string> = {
@@ -8,6 +9,11 @@ const TONE: Record<string, string> = {
   state: "var(--color-media-100)",
 };
 
+const NODE_W = 150;
+const NODE_H = 48;
+const HALF_W = NODE_W / 2;
+const HALF_H = NODE_H / 2;
+
 interface Props {
   title?: string;
   nodes: DiagramNode[];
@@ -15,15 +21,30 @@ interface Props {
 }
 
 /**
+ * Point on a node's rectangle border along the ray from the node centre toward
+ * (tx, ty). Lets edges connect at the correct side for ANY direction — not just
+ * left→right — so diagonal and feedback edges don't shoot out of the wrong face.
+ */
+function borderPoint(cx: number, cy: number, tx: number, ty: number): [number, number] {
+  const dx = tx - cx;
+  const dy = ty - cy;
+  if (dx === 0 && dy === 0) return [cx, cy];
+  const scale = 1 / Math.max(Math.abs(dx) / HALF_W, Math.abs(dy) / HALF_H);
+  return [cx + dx * scale, cy + dy * scale];
+}
+
+/**
  * Static, non-editable diagram renderer.
  *
- * We intentionally avoid React Flow here because its keyboard-editing guidance
- * leaks into crawled/reader text ("press enter or space to select a node"),
- * which is confusing in a learning article. This component is visual + readable.
+ * We avoid React Flow / xyflow here because its keyboard-editing guidance leaks
+ * into crawled/reader text ("press enter or space to select a node"), which is
+ * confusing in a learning article. This is visual + readable, supports curved
+ * feedback edges (so we can draw an actual loop), and reveals with a calm,
+ * one-time stagger.
  */
 export default function AgentDiagram({ title, nodes, edges }: Props) {
-  const width = Math.max(720, ...nodes.map((n) => n.x + 180));
-  const height = Math.max(300, ...nodes.map((n) => n.y + 80));
+  const width = Math.max(720, ...nodes.map((n) => n.x + NODE_W + 30));
+  const height = Math.max(300, ...nodes.map((n) => n.y + NODE_H + 32));
   const nodeMap = new Map(nodes.map((n) => [n.id, n]));
 
   return (
@@ -41,40 +62,74 @@ export default function AgentDiagram({ title, nodes, edges }: Props) {
             const from = nodeMap.get(edge.from);
             const to = nodeMap.get(edge.to);
             if (!from || !to) return null;
-            const x1 = from.x + 150;
-            const y1 = from.y + 24;
-            const x2 = to.x;
-            const y2 = to.y + 24;
-            const midX = (x1 + x2) / 2;
-            const midY = (y1 + y2) / 2;
+
+            const fcx = from.x + HALF_W;
+            const fcy = from.y + HALF_H;
+            const tcx = to.x + HALF_W;
+            const tcy = to.y + HALF_H;
+
+            const [x1, y1] = borderPoint(fcx, fcy, tcx, tcy);
+            const [x2, y2] = borderPoint(tcx, tcy, fcx, fcy);
+
+            // Unit normal to the edge direction — the axis we offset the label along.
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const len = Math.hypot(dx, dy) || 1;
+            const nx = -dy / len;
+            const ny = dx / len;
+
+            const mx = (x1 + x2) / 2;
+            const my = (y1 + y2) / 2;
+            const lx = mx + nx * -10;
+            const ly = my + ny * -10;
+
             return (
-              <g key={`${edge.from}-${edge.to}-${i}`}>
+              <motion.g
+                key={`${edge.from}-${edge.to}-${i}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.35, delay: 0.15 + i * 0.12 }}
+              >
                 <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--color-node-border)" strokeWidth="2" markerEnd="url(#arrow)" />
                 {edge.label && (
-                  <text x={midX} y={midY - 7} textAnchor="middle" fill="var(--color-foreground-300)" fontSize="12">
+                  <text x={lx} y={ly} textAnchor="middle" dominantBaseline="middle" fill="var(--color-foreground-300)" fontSize="12">
                     {edge.label}
                   </text>
                 )}
-              </g>
+              </motion.g>
             );
           })}
 
-          {nodes.map((node) => (
-            <g key={node.id}>
+          {nodes.map((node, i) => (
+            <motion.g
+              key={node.id}
+              initial={{ opacity: 0, scale: 0.94 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3, delay: i * 0.08 }}
+              style={{ transformBox: "fill-box", transformOrigin: "center" }}
+            >
               <rect
                 x={node.x}
                 y={node.y}
-                width="150"
-                height="48"
+                width={NODE_W}
+                height={NODE_H}
                 rx="10"
                 fill="var(--color-node-bg)"
                 stroke={TONE[node.tone ?? "agent"]}
                 strokeWidth="1.5"
               />
-              <text x={node.x + 75} y={node.y + 29} textAnchor="middle" fill="var(--color-foreground-100)" fontSize="13" fontWeight="600">
+              <text
+                x={node.x + HALF_W}
+                y={node.y + HALF_H + 1}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fill="var(--color-foreground-100)"
+                fontSize="13"
+                fontWeight="600"
+              >
                 {node.label}
               </text>
-            </g>
+            </motion.g>
           ))}
         </svg>
       </div>

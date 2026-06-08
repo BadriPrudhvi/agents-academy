@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import { Brain, CheckCircle, Cpu, Flag, Spinner, Wrench } from "@phosphor-icons/react";
+import { Brain, CaretRight, CheckCircle, Code, Cpu, Eye, Flag, Spinner, Wrench } from "@phosphor-icons/react";
 
 interface Tool {
   name: string;
@@ -18,21 +18,84 @@ interface Props {
 type Step =
   | { type: "goal"; text: string }
   | { type: "think"; text: string }
-  | { type: "tool"; name: string; args: unknown; result: string }
+  | { type: "tool"; name: string; args: unknown }
+  | { type: "observe"; text: string; data?: unknown }
   | { type: "answer"; text: string };
 
 const STEP_META: Record<Step["type"], { icon: typeof Brain; label: string; tone: string }> = {
   goal: { icon: Flag, label: "Goal", tone: "var(--color-foreground-300)" },
-  think: { icon: Brain, label: "The agent decides", tone: "var(--color-media-100)" },
+  think: { icon: Brain, label: "Decides", tone: "var(--color-media-100)" },
   tool: { icon: Wrench, label: "Calls a tool", tone: "var(--color-compute-100)" },
-  answer: { icon: CheckCircle, label: "Answer", tone: "var(--color-ai-100)" },
+  observe: { icon: Eye, label: "Reads the result", tone: "var(--color-ai-100)" },
+  answer: { icon: CheckCircle, label: "Answers", tone: "var(--color-ai-100)" },
 };
+
+/* The real loop behind the trace above — every beat the learner watched maps to
+ * one line here. Kept honest and static: this is the actual agent, not magic. */
+// A faithful (simplified) sketch of the real loop in src/pages/api/agent-run.ts.
+// Every line here is true — just abbreviated. The model picks the tool + args;
+// it never writes this code.
+const AGENT_CODE = `// An agent is a model + tools wired into a loop. That's the whole trick.
+const tools = [getSales, getSalesByRegion];        // what it CAN do
+const messages = [systemPrompt, userGoal];          // GOAL — what you asked
+
+for (let step = 0; step < MAX_STEPS; step++) {       // loop, with a safety cap
+  // DECIDES — the model reads the goal + tool list and picks a tool (or answers)
+  const reply = await model.run({ messages, tools });
+
+  if (!reply.toolCalls) {
+    return reply.content;                            // ANSWERS — grounded in what it read
+  }
+
+  for (const call of reply.toolCalls) {
+    // CALLS A TOOL — runs for real on your data, with the args the model chose
+    const data = runTool(call.name, call.args);
+    messages.push({ role: "tool", content: JSON.stringify(data) }); // READS IT, then loops
+  }
+}`;
+
+/** Render the arguments the model chose, e.g. \`{ region: "EU" }\` or empty. */
+function formatArgs(args: unknown): string {
+  if (!args || typeof args !== "object" || Array.isArray(args)) return "";
+  const entries = Object.entries(args as Record<string, unknown>);
+  if (!entries.length) return "";
+  return `{ ${entries.map(([k, v]) => `${k}: ${JSON.stringify(v)}`).join(", ")} }`;
+}
+
+/** Compact table for the rows a tool returned (array of flat objects). */
+function DataTable({ data }: { data: unknown }) {
+  if (!Array.isArray(data) || !data.length || typeof data[0] !== "object" || data[0] === null) return null;
+  const cols = Object.keys(data[0] as Record<string, unknown>);
+  return (
+    <div className="mt-2 overflow-x-auto rounded-md border border-border-100">
+      <table className="w-full text-xs">
+        <thead>
+          <tr className="bg-background-300 text-left text-text-secondary">
+            {cols.map((c) => (
+              <th key={c} className="px-2 py-1 font-medium">{c}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {(data as Record<string, unknown>[]).map((row, i) => (
+            <tr key={i} className="border-t border-border-100">
+              {cols.map((c) => (
+                <td key={c} className="px-2 py-1 text-foreground-200">{String(row[c])}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 export default function AgentRun(props: Props) {
   const [goal, setGoal] = useState("");
   const [busy, setBusy] = useState(false);
   const [trace, setTrace] = useState<Step[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showCode, setShowCode] = useState(false);
 
   async function runAgent(g: string) {
     const text = g.trim();
@@ -55,6 +118,9 @@ export default function AgentRun(props: Props) {
       setBusy(false);
     }
   }
+
+  const answered = trace?.some((s) => s.type === "answer");
+  const toolSteps = (trace ?? []).filter((s): s is Extract<Step, { type: "tool" }> => s.type === "tool");
 
   return (
     <section className="my-8 rounded-xl border border-border-100 bg-background-content">
@@ -104,7 +170,7 @@ export default function AgentRun(props: Props) {
 
         {busy && !trace && (
           <p className="mt-5 flex items-center gap-2 text-sm text-text-secondary">
-            <Spinner size={14} className="animate-spin" /> The agent is thinking and using its tools…
+            <Spinner size={14} className="animate-spin" /> The agent is deciding which tool to use…
           </p>
         )}
 
@@ -126,14 +192,21 @@ export default function AgentRun(props: Props) {
                   <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border border-border-100 bg-background-content" style={{ color: meta.tone }}>
                     <Icon size={14} weight="fill" />
                   </span>
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="text-[11px] font-medium uppercase tracking-wider" style={{ color: meta.tone }}>
                       {meta.label}
                     </p>
                     {step.type === "tool" ? (
                       <p className="mt-0.5 text-sm text-foreground-200">
-                        <code className="rounded bg-background-300 px-1 py-0.5">{step.name}()</code> → {step.result}
+                        <code className="rounded bg-background-300 px-1 py-0.5">
+                          {step.name}({formatArgs(step.args)})
+                        </code>
                       </p>
+                    ) : step.type === "observe" ? (
+                      <>
+                        <p className="mt-0.5 text-sm text-foreground-200">{step.text}</p>
+                        <DataTable data={step.data} />
+                      </>
                     ) : (
                       <p className="mt-0.5 text-sm text-foreground-200">{step.text}</p>
                     )}
@@ -143,6 +216,51 @@ export default function AgentRun(props: Props) {
             })}
           </ol>
         )}
+
+        {answered && !busy && (
+          <p className="mt-1 rounded-md border border-border-100 bg-background-300 px-3 py-2 text-xs text-text-secondary">
+            A plain chatbot would answer from memory — and might guess. This agent <strong>chose a tool</strong>, read the
+            <strong> real rows</strong>, then answered from them. That decide → act → observe → answer loop is the difference.
+          </p>
+        )}
+
+        <div className="mt-5 border-t border-border-100 pt-4">
+          <button
+            onClick={() => setShowCode((v) => !v)}
+            aria-expanded={showCode}
+            className="inline-flex items-center gap-1.5 text-xs text-text-secondary transition-colors hover:text-foreground-200"
+          >
+            <Code size={13} />
+            {showCode ? "Hide" : "See the loop behind this agent"}
+            <CaretRight size={11} weight="bold" className={`transition-transform ${showCode ? "rotate-90" : ""}`} />
+          </button>
+          {showCode && (
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="overflow-hidden">
+              <p className="mt-3 text-xs text-text-secondary">
+                A simplified sketch of the real loop (in <code>agent-run.ts</code>) — every line is true, just abbreviated.
+                There's no hidden magic: a model, its tools, and a loop.
+              </p>
+              <pre className="mt-2 overflow-x-auto rounded-md border border-border-100 bg-background-300 p-3 text-[12px] leading-relaxed">
+                <code>{AGENT_CODE}</code>
+              </pre>
+              {toolSteps.length > 0 && (
+                <p className="mt-3 text-xs text-text-secondary">
+                  <span className="text-foreground-200">Your run, mapped onto the loop:</span> at the{" "}
+                  <code className="rounded bg-background-300 px-1 py-0.5">model.run</code> line the model chose{" "}
+                  {toolSteps.map((s, idx) => (
+                    <span key={idx}>
+                      <code className="rounded bg-background-300 px-1 py-0.5">
+                        {s.name}({formatArgs(s.args)})
+                      </code>
+                      {idx < toolSteps.length - 1 ? ", then " : ""}
+                    </span>
+                  ))}
+                  . It picked the tool and the arguments — it did <strong>not</strong> write this code.
+                </p>
+              )}
+            </motion.div>
+          )}
+        </div>
       </div>
     </section>
   );
