@@ -1,20 +1,12 @@
 ---
 import Base from "../../../layouts/Base.astro";
 import { getLesson, getTrack } from "../../../lib/content";
-import { roleIdFromLabel } from "../../../lib/roles";
 import { highlight } from "../../../lib/highlight";
-import CodeLab from "../../../components/interactive/code-lab/CodeLab.tsx";
-import Quiz from "../../../components/interactive/Quiz.tsx";
+import { slugify } from "../../../lib/content/inline";
+import BlockRenderer from "../../../components/content/BlockRenderer.astro";
 import TutorPanel from "../../../components/interactive/tutor/TutorPanel.tsx";
 import LessonProgress from "../../../components/interactive/LessonProgress.tsx";
 import ViewToggle from "../../../components/interactive/ViewToggle.tsx";
-import AgentDiagram from "../../../components/interactive/AgentDiagram.tsx";
-import FlowDiagram from "../../../components/interactive/FlowDiagram.tsx";
-
-import AgentStudio from "../../../components/interactive/AgentStudio.tsx";
-import AgentRun from "../../../components/interactive/AgentRun.tsx";
-import StreamingChat from "../../../components/interactive/StreamingChat.tsx";
-import WatchItRun from "../../../components/interactive/WatchItRun.tsx";
 import LessonFeedback from "../../../components/interactive/LessonFeedback.tsx";
 import { Clock, Target } from "@phosphor-icons/react";
 
@@ -38,26 +30,6 @@ for (let i = 0; i < lesson.blocks.length; i++) {
 const toc = lesson.blocks
   .filter((b): b is Extract<typeof b, { kind: "heading" }> => b.kind === "heading")
   .map((b) => ({ id: b.id ?? slugify(b.text), text: b.text }));
-
-function slugify(s: string) {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-}
-
-// Minimal inline formatter: **bold**, `code`, [text](url).
-function inline(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/`([^`]+)`/g, '<code class="rounded bg-background-300 px-1 py-0.5 text-[0.9em]">$1</code>')
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a class="text-accent-muted underline" href="$2" target="_blank" rel="noreferrer">$1</a>');
-}
-
-const calloutTone: Record<string, string> = {
-  note: "border-compute-100 bg-compute-100/5",
-  tip: "border-ai-100 bg-ai-200",
-  warning: "border-security-100 bg-security-100/5",
-};
 ---
 
 <Base title={lesson.title} description={lesson.summary}>
@@ -93,105 +65,7 @@ const calloutTone: Record<string, string> = {
         </div>
 
         {lesson.blocks.map((b, i) => (
-          <div
-            data-aud={b.audience ?? undefined}
-            data-analogy-role={b.kind === "analogy" ? (roleIdFromLabel(b.role) ?? slugify(b.role)) : undefined}
-            data-role-hide={b.kind === "analogy" && i > 0 && lesson.blocks[i - 1].kind === "analogy" ? "true" : undefined}
-          >
-            {b.kind === "heading" && (
-              <h2 id={b.id ?? slugify(b.text)} class="mt-10 scroll-mt-20 text-2xl">{b.text}</h2>
-            )}
-            {b.kind === "prose" && <p class="mt-4 leading-relaxed text-foreground-200" set:html={inline(b.text)} />}
-            {b.kind === "list" && (
-              <ul class={`mt-4 space-y-1.5 pl-5 text-foreground-200 ${b.ordered ? "list-decimal" : "list-disc"}`}>
-                {b.items.map((it) => <li set:html={inline(it)} />)}
-              </ul>
-            )}
-            {b.kind === "callout" && (
-              <div class={`mt-5 rounded-lg border-l-2 px-4 py-3 ${calloutTone[b.tone]}`}>
-                {b.title && <p class="text-sm font-medium text-foreground-100">{b.title}</p>}
-                <p class="mt-0.5 text-sm text-foreground-200" set:html={inline(b.text)} />
-              </div>
-            )}
-            {b.kind === "analogy" && (
-              <div class="mt-5 border-l-2 border-accent-100/30 pl-4">
-                <p class="font-mono text-[11px] uppercase tracking-wider text-accent-muted">In your world — {b.role}</p>
-                <p class="mt-1 text-sm text-foreground-200" set:html={inline(b.text)} />
-              </div>
-            )}
-            {b.kind === "code" && (
-              <figure class="mt-5">
-                <div class="overflow-x-auto rounded-lg border border-border-100 text-[13px] [&_pre]:m-0 [&_pre]:p-4" set:html={codeHtml.get(i)} />
-                {b.caption && <figcaption class="mt-1.5 font-mono text-xs text-text-secondary">{b.caption}</figcaption>}
-              </figure>
-            )}
-            {b.kind === "diagram" && (
-              <AgentDiagram client:visible title={b.title} nodes={b.nodes} edges={b.edges} />
-            )}
-            {b.kind === "agentFlow" && (
-              <FlowDiagram client:visible title={b.title} caption={b.caption} steps={b.steps} loop={b.loop} />
-            )}
-            {b.kind === "watch" && lesson.labs[b.labId] && (
-              <WatchItRun client:visible lessonSlug={lesson.slug} labId={b.labId} caption={b.caption} />
-            )}
-            {b.kind === "agentRun" && lesson.agentRuns?.[b.runId] && (
-              <AgentRun
-                client:visible
-                lessonSlug={lesson.slug}
-                runId={lesson.agentRuns[b.runId].id}
-                intro={lesson.agentRuns[b.runId].intro}
-                model={lesson.agentRuns[b.runId].model}
-                tools={lesson.agentRuns[b.runId].tools}
-                examples={lesson.agentRuns[b.runId].examples}
-              />
-            )}
-            {b.kind === "streamChat" && lesson.streamChats?.[b.chatId] && (
-              <StreamingChat
-                client:visible
-                lessonSlug={lesson.slug}
-                chatId={lesson.streamChats[b.chatId].id}
-                intro={lesson.streamChats[b.chatId].intro}
-                model={lesson.streamChats[b.chatId].model}
-                examples={lesson.streamChats[b.chatId].examples}
-              />
-            )}
-            {b.kind === "agentStudio" && lesson.studios?.[b.studioId] && (
-              <AgentStudio
-                client:visible
-                lessonSlug={lesson.slug}
-                studioId={lesson.studios[b.studioId].id}
-                title={lesson.studios[b.studioId].title}
-                intro={lesson.studios[b.studioId].intro}
-                toolName={lesson.studios[b.studioId].toolName}
-                toolPreview={lesson.studios[b.studioId].toolPreview}
-                starterProgram={lesson.studios[b.studioId].starterProgram}
-                capabilities={lesson.studios[b.studioId].capabilities}
-                goals={lesson.studios[b.studioId].goals.map((g) => ({ id: g.id, label: g.label, program: g.program, chatbotGuess: g.chatbotGuess }))}
-                aiEnabled={lesson.studios[b.studioId].aiEnabled}
-              />
-            )}
-            {b.kind === "codelab" && lesson.labs[b.labId] && (
-              <CodeLab
-                client:visible
-                lessonSlug={lesson.slug}
-                labId={lesson.labs[b.labId].id}
-                runCmd={lesson.labs[b.labId].runCmd}
-                prompt={lesson.labs[b.labId].challenge.prompt}
-                files={lesson.labs[b.labId].files.map((f) => ({ path: f.path, language: f.language, contents: f.contents, readOnly: f.readOnly }))}
-                checks={lesson.labs[b.labId].challenge.checks.map((c) => ({ id: c.id, describe: c.describe }))}
-                solutionHint={lesson.labs[b.labId].challenge.solutionHint}
-              />
-            )}
-            {b.kind === "quiz" && lesson.quizzes[b.quizId] && (
-              <Quiz
-                client:visible
-                question={lesson.quizzes[b.quizId].question}
-                options={lesson.quizzes[b.quizId].options}
-                answerIndex={lesson.quizzes[b.quizId].answerIndex}
-                explanation={lesson.quizzes[b.quizId].explanation}
-              />
-            )}
-          </div>
+          <BlockRenderer lesson={lesson} block={b} index={i} codeHtml={codeHtml.get(i)} />
         ))}
 
         {/* Recap + next */}
