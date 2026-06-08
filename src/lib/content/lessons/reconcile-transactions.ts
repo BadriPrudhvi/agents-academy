@@ -30,6 +30,7 @@ export const reconcileTransactions: Lesson = {
   title: "Reconcile transactions with an agent",
   summary:
     "A finance use-case: the agent pulls two sources, matches them, and flags what doesn't reconcile — no manual cross-checking.",
+  bigIdea: "Match in **code** — exact and auditable — and surface only the exceptions.",
 
   outcomes: [
     "Describe how an agent reconciles two data sources.",
@@ -58,12 +59,11 @@ export const reconcileTransactions: Lesson = {
     { kind: "heading", text: "The reconciliation problem", id: "problem" },
     {
       kind: "prose",
-      text: "You have two records of the same money — say **bank transactions** and your **ledger**. Reconciliation means: which entries match, and which don't? Agents are great at this because the rule is exact and the boring part (comparing every row) is just code.",
+      text: "Two records of the same money — **bank transactions** and your **ledger**. Reconciliation asks: which entries match, and which don't?",
     },
     {
       kind: "diagram",
       title: "Reconcile two sources",
-      caption: "Two data sources go in; only the exceptions come out.",
       nodes: [
         { id: "bank", label: "Bank rows", tone: "tool", icon: "table", x: 0, y: 0 },
         { id: "ledger", label: "Ledger rows", tone: "tool", icon: "table", x: 0, y: 160 },
@@ -77,16 +77,22 @@ export const reconcileTransactions: Lesson = {
       ],
     },
     {
+      kind: "compare",
+      left: {
+        title: "Model eyeballs it",
+        items: ["Approximate read of two tables", "Different answer each run", "Hard to audit"],
+      },
+      right: {
+        title: "Code matches it",
+        items: ["Compare id + amount exactly", "Same answer every time", "Auditable"],
+      },
+    },
+    { kind: "statement", text: "Surface only the **exceptions**.", sub: "Compare everything in code; hand a human the handful that don't agree." },
+    {
       kind: "analogy",
       role: "Finance",
       audience: "concept",
-      text: "It's your month-end tie-out: match each bank line to a ledger entry by reference and amount, then chase only the handful that don't agree. The agent does the matching and hands you the exceptions.",
-    },
-    {
-      kind: "callout",
-      tone: "warning",
-      title: "Exact, not approximate",
-      text: "Never let a model 'judge' whether numbers match. The agent compares id + amount in code, so the result is exact, the same every time, and easy to audit.",
+      text: "Your month-end tie-out: match each bank line to a ledger entry by reference and amount, then chase only the few that don't agree. The agent does the matching.",
     },
 
     { kind: "heading", text: "What the agent does", id: "does", audience: "concept" },
@@ -108,7 +114,7 @@ export const reconcileTransactions: Lesson = {
     {
       kind: "prose",
       audience: "concept",
-      text: "Switch to **Code** view to complete it — the matching rule is two lines.",
+      text: "Switch to **Code** to complete it — the matching rule is two lines.",
     },
 
     { kind: "heading", text: "Complete the reconciliation", id: "build", audience: "code" },
