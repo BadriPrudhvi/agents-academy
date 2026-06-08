@@ -16,7 +16,7 @@
     "enabled": true
   },
   "vars": {
-    // Runner mode: "mock" (local, no cost) | "sandbox" (real Containers). Flagged per Spike B gate.
+    // Runner mode: "mock" (local, no cost) | "sandbox" (real Containers). Production sets "sandbox".
     "RUNNER_MODE": "mock",
     // Tutor mode: "mock" (canned, no cost) | "live" (Workers AI via AI Gateway + AutoRAG).
     "TUTOR_MODE": "mock"

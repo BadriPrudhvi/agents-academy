@@ -7,7 +7,7 @@ import { streamingChat } from "./lessons/streaming-chat";
 import { agentHarness } from "./lessons/agent-harness";
 import { agentsWriteCode } from "./lessons/agents-write-code";
 import { firstDataAgent } from "./lessons/first-data-agent";
-import { financeReconciliation } from "./lessons/finance-reconciliation";
+import { reconcileTransactions } from "./lessons/reconcile-transactions";
 
 export type { Lesson, Track } from "./types";
 export { TRACKS, getTrack };
@@ -21,7 +21,7 @@ const LESSONS: Lesson[] = [
   agentHarness,
   agentsWriteCode,
   firstDataAgent,
-  financeReconciliation,
+  reconcileTransactions,
 ];
 
 /** Lightweight card for the hub (authored lessons + "coming soon" placeholders). */

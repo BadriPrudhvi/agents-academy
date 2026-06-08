@@ -66,7 +66,7 @@ const SIMULATORS: Record<string, Simulator> = {
   // Lesson: agents-write-code / lab: codemode-sales
   "codemode-sales": codemodeSalesSim,
 
-  // Lesson: finance-reconciliation / lab: reconcile
+  // Lesson: reconcile-transactions / lab: reconcile
   reconcile(files) {
     const src = stripComments(files.find((f) => f.path === "task.js")?.contents ?? "");
     const callsBank = src.includes("codemode.bankRows");

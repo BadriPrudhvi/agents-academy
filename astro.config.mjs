@@ -6,8 +6,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 // Agents Academy — Astro SSR on Cloudflare Workers + React 19 islands.
 // Mirrors the cloudflare/fe/marketing-site stack (Astro + @astrojs/cloudflare,
-// React islands, Tailwind v4 @theme). Production target upgrades to Astro 6 to
-// match marketing-site exactly; the component/design-system code is identical.
+// React islands, Tailwind v4 @theme).
 export default defineConfig({
   output: "server",
   adapter: cloudflare({

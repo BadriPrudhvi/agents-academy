@@ -23,7 +23,7 @@ const solution = `export default async function () {
   console.log(\`Unmatched: \${unmatched.length} (\${unmatched.map((r) => r.id).join(", ")})\`);
 }`;
 
-export const financeReconciliation: Lesson = {
+export const reconcileTransactions: Lesson = {
   slug: "reconcile-transactions",
   trackId: "tools",
   order: 4,
