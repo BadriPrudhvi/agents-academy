@@ -8,6 +8,7 @@ const TONE: Record<string, string> = {
   model: TONE_VAR.ai,
   tool: TONE_VAR.compute,
   state: TONE_VAR.media,
+  output: TONE_VAR.muted,
 };
 
 const NODE_W = 150;

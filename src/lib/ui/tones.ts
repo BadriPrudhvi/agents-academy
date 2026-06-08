@@ -20,6 +20,9 @@ export const TONE_VAR = {
   ai: "var(--color-ai-100)",
   compute: "var(--color-compute-100)",
   media: "var(--color-media-100)",
+  /** Muted neutral for terminal output/result nodes (mirrors FlowDiagram's
+   *  `result` tone), so outputs no longer borrow the `state`/memory colour. */
+  muted: "var(--color-text-secondary)",
 } as const;
 
 /** Tailwind class pairs for the FlowDiagram boxes (border+bg / label colour). */

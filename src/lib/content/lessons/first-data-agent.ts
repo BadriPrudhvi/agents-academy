@@ -78,7 +78,7 @@ export const firstDataAgent: Lesson = {
         { id: "q", label: "Question about data", tone: "user", x: 0, y: 110 },
         { id: "agent", label: "Agent", tone: "agent", x: 220, y: 110 },
         { id: "box", label: "Sandbox (Python)", tone: "tool", x: 450, y: 30 },
-        { id: "out", label: "Computed result", tone: "state", x: 450, y: 190 },
+        { id: "out", label: "Computed result", tone: "output", x: 450, y: 190 },
       ],
       edges: [
         { from: "q", to: "agent" },

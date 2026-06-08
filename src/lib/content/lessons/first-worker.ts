@@ -101,7 +101,7 @@ export const firstWorker: Lesson = {
       nodes: [
         { id: "user", label: "Request", tone: "user", x: 0, y: 110 },
         { id: "worker", label: "Worker (fetch)", tone: "agent", x: 250, y: 110 },
-        { id: "resp", label: "Response", tone: "state", x: 520, y: 30 },
+        { id: "resp", label: "Response", tone: "output", x: 520, y: 30 },
         { id: "binding", label: "Binding (e.g. AI)", tone: "tool", x: 520, y: 190 },
       ],
       edges: [

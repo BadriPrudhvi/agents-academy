@@ -22,7 +22,7 @@ export interface DiagramNode {
   id: string;
   label: string;
   /** Visual role -> color token. */
-  tone?: "user" | "agent" | "model" | "tool" | "state";
+  tone?: "user" | "agent" | "model" | "tool" | "state" | "output";
   x: number;
   y: number;
 }

@@ -9,6 +9,7 @@ describe("TONE_VAR palette", () => {
       ai: "var(--color-ai-100)",
       compute: "var(--color-compute-100)",
       media: "var(--color-media-100)",
+      muted: "var(--color-text-secondary)",
     });
   });
 });

@@ -67,7 +67,7 @@ export const reconcileTransactions: Lesson = {
         { id: "bank", label: "Bank rows (tool)", tone: "model", x: 0, y: 30 },
         { id: "ledger", label: "Ledger rows (tool)", tone: "model", x: 0, y: 190 },
         { id: "agent", label: "Agent writes match code", tone: "agent", x: 250, y: 110 },
-        { id: "out", label: "Unmatched → review", tone: "state", x: 500, y: 110 },
+        { id: "out", label: "Unmatched → review", tone: "output", x: 500, y: 110 },
       ],
       edges: [
         { from: "bank", to: "agent" },
