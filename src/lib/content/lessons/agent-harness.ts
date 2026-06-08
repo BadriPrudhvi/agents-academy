@@ -62,6 +62,7 @@ export const agentHarness: Lesson = {
   title: "Project Think vs. your own loop",
   summary:
     "Two ways to build a chat agent: the opinionated Think harness (a few lines) or your own streamText loop for full control. Learn when to pick which.",
+  bigIdea: "You don't hand-write the agent loop — you **adopt** one, or **wire** one.",
 
   outcomes: [
     "Describe what an agent harness does that a raw model call doesn't.",
@@ -90,13 +91,11 @@ export const agentHarness: Lesson = {
     { kind: "heading", text: "Harness or hand-built?", id: "what" },
     {
       kind: "prose",
-      text: "You already saw the agent loop — **decide → act → observe → answer**, repeating until done. In real apps you don't write that loop by hand. You either adopt an **opinionated harness** that runs it for you, or wire up the **AI SDK's loop yourself** when you need control. Cloudflare gives you both: **Think** and **AIChatAgent**.",
+      text: "You've seen the agent loop. In real apps you don't write it by hand — you adopt a harness that runs it, or wire the AI SDK's loop yourself. Cloudflare gives you both.",
     },
     {
       kind: "diagram",
       title: "The loop a harness runs for you",
-      caption:
-        "Think runs this whole loop from a 3-line subclass. With AIChatAgent you wire the same loop yourself via streamText + stopWhen.",
       nodes: [
         { id: "goal", label: "Goal", tone: "user", icon: "flag", x: 0, y: 80 },
         { id: "decide", label: "Decides", tone: "model", icon: "brain", x: 230, y: 80 },
@@ -117,14 +116,33 @@ export const agentHarness: Lesson = {
     {
       kind: "prose",
       audience: "concept",
-      text: "Here's that loop, **live** — the exact decide → act → observe → answer cycle a harness runs for you. Give it a goal and watch it pick a tool, read real data, and answer. Think runs this from a 3-line class; with your own loop you wire the same cycle yourself.",
+      text: "Here's that loop, **live**. Give it a goal; watch it pick a tool, read real data, and answer.",
     },
     { kind: "agentRun", runId: "loop", audience: "concept" },
+
+    { kind: "statement", text: "Two ways to build it: **adopt** or **wire**.", sub: "Think runs the loop for you · AIChatAgent hands you the model call" },
+    {
+      kind: "compare",
+      left: {
+        title: "Think (opinionated)",
+        items: ["~3-line subclass — getModel()", "Loop, memory, streaming built in", "Search + helper sub-agents free", "Ship fast"],
+      },
+      right: {
+        title: "Your own loop (AIChatAgent)",
+        items: ["You own the model call", "Custom RAG, multiple models", "You set the stop limit (stopWhen)", "Full control"],
+      },
+    },
+    {
+      kind: "analogy",
+      role: "Data engineer",
+      audience: "concept",
+      text: "Like choosing a managed service over standing up infra yourself: persistence, scaling, and recovery come built in, and you customize by configuration — not by rebuilding the pipeline.",
+    },
 
     { kind: "heading", text: "Option A — Think (opinionated)", id: "think" },
     {
       kind: "prose",
-      text: "**Think** (`@cloudflare/think`) is a full chat-agent framework. You provide a model with `getModel()`; it wires the agentic loop, message persistence, streaming, tools, stream resumption, memory, and sub-agents. The minimal agent is about three lines.",
+      text: "**Think** (`@cloudflare/think`) wires the loop, persistence, streaming, tools, memory, and sub-agents. You implement `getModel()` — about three lines.",
     },
     {
       kind: "code",
@@ -134,22 +152,15 @@ export const agentHarness: Lesson = {
       code: thinkServer,
     },
     {
-      kind: "analogy",
-      role: "Data engineer",
-      audience: "concept",
-      text: "Like choosing a managed service over standing up the infra yourself: you get persistence, scaling, and recovery out of the box, and you customize via configuration, not by rebuilding the pipeline.",
-    },
-    {
-      kind: "analogy",
-      role: "ML engineer",
-      audience: "concept",
-      text: "Think is the high-level trainer API; the own-loop path is writing your custom training loop. Reach for the framework first, drop down only where you need bespoke control.",
+      kind: "pills",
+      label: "Think ships with:",
+      items: ["memory", "streaming", "persistence", "tool-calling", "search", "sub-agents"],
     },
 
     { kind: "heading", text: "Option B — your own loop (AIChatAgent)", id: "own" },
     {
       kind: "prose",
-      text: "**AIChatAgent** is a protocol adapter: it handles the WebSocket, persistence, and resume, but the model call is yours. You override `onChatMessage`, call `streamText` with your tools, and set `stopWhen` — that's the loop, under your control.",
+      text: "**AIChatAgent** handles the WebSocket, persistence, and resume — the model call is yours. Override `onChatMessage`, call `streamText` with your tools, and set `stopWhen`.",
     },
     {
       kind: "code",
@@ -163,34 +174,13 @@ export const agentHarness: Lesson = {
       tone: "tip",
       audience: "code",
       title: "What's stopWhen?",
-      text: "`stopWhen: stepCountIs(5)` just means: let the model call tools and keep going for up to 5 rounds, then it must give a final answer. It's the safety limit on the loop — exactly the cap you saw earlier.",
+      text: "`stopWhen: stepCountIs(5)` means: let the model call tools for up to 5 rounds, then it must give a final answer. It's the safety limit on the loop.",
     },
 
     { kind: "heading", text: "Which should you pick?", id: "choose" },
     {
       kind: "prose",
-      text: "Both extend `Agent` and speak the same chat protocol, so you can start with one and move later. The split is about how much you want decided for you.",
-    },
-    {
-      kind: "list",
-      ordered: false,
-      items: [
-        "**Reach for Think** when you want to ship fast and get memory, long-conversation handling, search, and helper sub-agents out of the box.",
-        "**Reach for your own loop (AIChatAgent)** when you need full control of the model call — your own retrieval, multiple models, or custom streaming.",
-        "**Either way, you're not hand-writing the loop:** Think runs it for you; AIChatAgent lets the AI SDK run it via `stopWhen`.",
-      ],
-    },
-    {
-      kind: "callout",
-      tone: "tip",
-      title: "Rule of thumb",
-      text: "Start with Think. Drop to AIChatAgent the moment you need to own the model call. Both share the same Durable Object foundation, so switching is cheap.",
-    },
-    {
-      kind: "callout",
-      tone: "note",
-      title: "Going deeper (later)",
-      text: "Think also has features you'll meet once you need them: memory the model can edit, automatic trimming of very long chats, search across past conversations, and spawning helper sub-agents. Don't worry about these yet — `getModel()` is all you need to start.",
+      text: "Both extend `Agent` and share one Durable Object base, so you can switch later. **Rule of thumb:** start with Think; drop to AIChatAgent the moment you need to own the model call.",
     },
 
     { kind: "heading", text: "Check your understanding", id: "check" },
@@ -203,7 +193,7 @@ export const agentHarness: Lesson = {
   agentRuns: {
     loop: {
       id: "loop",
-      intro: "The agentic loop, live: a model with two tools. Think runs this for you; with your own loop you wire it via streamText + stopWhen.",
+      intro: "",
       model: "GLM-4.7-Flash (Workers AI)",
       tools: [
         { name: "getSales", description: "Returns every sales record." },
