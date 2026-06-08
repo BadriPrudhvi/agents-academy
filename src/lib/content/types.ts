@@ -44,6 +44,7 @@ export type Block = ({ audience?: Audience }) & (
   | { kind: "watch"; labId: string; caption?: string } // no-code "see it run" (runs the solution)
   | { kind: "agentSim"; simId: string } // no-code interactive: drive an agent, watch the loop
   | { kind: "agentBuilder"; builderId: string } // no-code builder: add capabilities one by one
+  | { kind: "agentStudio"; studioId: string } // unified: build + edit + AI codegen + run for real
   | { kind: "codelab"; labId: string } // anchors the interactive island
   | { kind: "quiz"; quizId: string }
 );
@@ -93,6 +94,45 @@ export interface AgentBuilder {
   title: string;
   intro: string;
   steps: AgentBuilderStep[];
+}
+
+/* ── Agent Studio: unified build + edit + AI-write + run-for-real interactive ── */
+
+/** A capability button: clicking inserts this code into the editor. */
+export interface AgentStudioCapability {
+  id: string;
+  label: string;
+  plain: string;
+  /** Code snippet appended to the editor when added. */
+  insert: string;
+}
+
+/** A preset goal: selecting it loads a complete runnable program. */
+export interface AgentStudioGoal {
+  id: string;
+  label: string;
+  /** Full runnable program (export default async function). */
+  program: string;
+  /** Illustrative ungrounded chatbot answer, for the contrast panel. */
+  chatbotGuess?: string;
+}
+
+export interface AgentStudio {
+  id: string;
+  title: string;
+  intro: string;
+  /** Display name of the tool surface, e.g. "codemode.listSales()". */
+  toolName: string;
+  /** Human description of available tools — fed to the AI codegen prompt. */
+  toolCatalog: string;
+  /** The data the tool returns — shown so the learner sees what the agent reads. */
+  toolPreview: { columns: string[]; rows: (string | number)[][] };
+  /** Program seeded into the editor on first load. */
+  starterProgram: string;
+  capabilities: AgentStudioCapability[];
+  goals: AgentStudioGoal[];
+  /** Enable the natural-language "ask the AI to write code" box. */
+  aiEnabled?: boolean;
 }
 
 export type CodeLanguage = "typescript" | "javascript" | "python" | "json" | "jsonc" | "toml";
@@ -171,6 +211,7 @@ export interface Lesson {
   quizzes: Record<string, RetrievalQuiz>;
   sims?: Record<string, AgentSim>;
   builders?: Record<string, AgentBuilder>;
+  studios?: Record<string, AgentStudio>;
 
   recap: string[];
   next?: { slug: string; label: string };

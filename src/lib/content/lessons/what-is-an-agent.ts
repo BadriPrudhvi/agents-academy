@@ -2,25 +2,27 @@ import type { Lesson } from "../types";
 
 /* ============================================================================
  * Track: foundations · Lesson 1 — the no-code-first starting point.
- * Designed so a non-technical learner (analyst/finance) finishes with real
- * understanding and a live demo, without writing or reading code.
+ *
+ * Centerpiece is the Agent Studio: learners assemble an agent with buttons,
+ * ask the AI to write code in plain English, edit it, and RUN it for real in
+ * the Sandbox — no pass/fail challenge.
  * ========================================================================== */
 
-const starter = `// One tool is available: codemode.listSales() -> [{ product, region, revenue }]
-export default async function () {
-  // TODO 1: get the sales rows with await codemode.listSales()
-  // TODO 2: add up revenue per product and pick the highest
-  // TODO 3: console.log(\`Top product: \${name} ($\${total})\`)
+const starterProgram = `export default async function () {
+  // Build your agent: pick a goal or add capabilities on the left,
+  // or ask the AI in plain English. Then press "Run in Sandbox".
+  const rows = await codemode.listSales();
+  console.log("Loaded " + rows.length + " sales rows");
 }`;
 
-const solution = `export default async function () {
+const topProductProgram = `export default async function () {
   const rows = await codemode.listSales();
   const totals = {};
   for (const r of rows) {
     totals[r.product] = (totals[r.product] ?? 0) + r.revenue;
   }
   const top = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
-  console.log(\`Top product: \${top[0]} ($\${top[1]})\`);
+  console.log("Top product: " + top[0] + " ($" + top[1] + ")");
 }`;
 
 const topRegionProgram = `export default async function () {
@@ -30,13 +32,13 @@ const topRegionProgram = `export default async function () {
     totals[r.region] = (totals[r.region] ?? 0) + r.revenue;
   }
   const top = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
-  console.log(\`Top region: \${top[0]} ($\${top[1]})\`);
+  console.log("Top region: " + top[0] + " ($" + top[1] + ")");
 }`;
 
 const totalRevenueProgram = `export default async function () {
   const rows = await codemode.listSales();
   const total = rows.reduce((sum, r) => sum + r.revenue, 0);
-  console.log(\`Total revenue: $\${total}\`);
+  console.log("Total revenue: $" + total);
 }`;
 
 export const whatIsAnAgent: Lesson = {
@@ -45,17 +47,17 @@ export const whatIsAnAgent: Lesson = {
   order: 1,
   title: "What is an AI agent?",
   summary:
-    "Start here. Understand what makes software an 'agent' — in plain language — and watch one do real work, no coding required.",
+    "Start here. Understand what makes software an 'agent' — in plain language — then build one and run it for real, with or without code.",
 
   outcomes: [
     "Say what an AI agent is in one sentence.",
     "Tell an agent apart from a chatbot or a simple automation.",
-    "Watch an agent complete a real task end to end.",
+    "Assemble and run a working agent — by clicking, by asking in English, or by editing code.",
   ],
   prerequisites: ["None — this is the starting point."],
   whyItMatters:
     "Before building anything, it helps to know what you're building. Agents are showing up in analytics, finance, and operations work — this lesson gives you the mental model the rest of the course builds on.",
-  timeEstimateMin: 8,
+  timeEstimateMin: 10,
   competencies: ["agent-concept"],
   misconceptions: [
     {
@@ -66,7 +68,7 @@ export const whatIsAnAgent: Lesson = {
     {
       belief: "Using agents means I have to be a programmer.",
       correction:
-        "Not to understand or direct them. You describe the goal; the agent figures out the steps and can even write the code. This course shows both the no-code view and the code view — your choice.",
+        "Not to understand or direct them. You describe the goal; the agent figures out the steps and can even write the code. This lesson lets you click, ask in English, or edit code — your choice.",
     },
   ],
 
@@ -110,33 +112,12 @@ export const whatIsAnAgent: Lesson = {
       text: "An agent is software that remembers, decides, and acts toward a goal — using tools and data along the way.",
     },
 
-    { kind: "heading", text: "Build the agent piece by piece", id: "builder", audience: "concept" },
+    { kind: "heading", text: "Build and run your own agent", id: "studio" },
     {
       kind: "prose",
-      audience: "concept",
-      text: "Instead of starting with code, let's assemble the agent like a checklist. Each button adds one capability. Press **Run current agent** after each step to see what the agent can do now.",
+      text: "Now make one. Pick a goal, add capabilities, or just **ask in plain English** and let the AI write the code. Then press **Run in Sandbox** to execute it for real and see the answer. No coding required — but the editor is yours if you want it.",
     },
-    { kind: "agentBuilder", builderId: "sales-agent", audience: "concept" },
-
-    { kind: "heading", text: "Drive an agent yourself", id: "see", audience: "concept" },
-    {
-      kind: "prose",
-      audience: "concept",
-      text: "Now you choose the goal. The agent will read real data, decide what to compute, and show the answer. You don't write code — you steer the task and watch the loop.",
-    },
-    {
-      kind: "agentSim",
-      audience: "concept",
-      simId: "sales",
-    },
-
-    { kind: "heading", text: "Try it yourself", id: "try", audience: "code" },
-    {
-      kind: "prose",
-      audience: "code",
-      text: "Same task, in code. One tool is provided — `codemode.listSales()`. Total revenue per product and print the top one. Press **Run**, then **Check**.",
-    },
-    { kind: "codelab", labId: "agent-demo", audience: "code" },
+    { kind: "agentStudio", studioId: "sales" },
 
     { kind: "heading", text: "Check your understanding", id: "check" },
     { kind: "quiz", quizId: "agent-first-step" },
@@ -144,82 +125,15 @@ export const whatIsAnAgent: Lesson = {
     { kind: "quiz", quizId: "agent-vs-chatbot" },
   ],
 
-  builders: {
-    "sales-agent": {
-      id: "sales-agent",
-      title: "Build a tiny sales agent",
-      intro: "Click each capability to see how a goal becomes an agent. The code appears in parallel, but you don't need to write it.",
-      steps: [
-        {
-          id: "goal",
-          label: "Add a goal",
-          plain: "Tell the agent what outcome you want.",
-          code: `const goal = "Find the top product by revenue";`,
-          output: "Goal saved: Find the top product by revenue.\n\nThe agent knows what you want, but it cannot answer yet because it has no data.",
-        },
-        {
-          id: "tool",
-          label: "Add a data tool",
-          plain: "Give the agent a safe way to read the sales table.",
-          code: `const rows = await codemode.listSales();`,
-          output: "Tool connected: sales data loaded.\n\nRows available:\n- Widget A / NA / 25000\n- Widget A / EU / 17000\n- Gadget B / NA / 30000\n- Sprocket C / EU / 12000",
-        },
-        {
-          id: "decision",
-          label: "Add a decision step",
-          plain: "Decide how to turn rows into an answer.",
-          code: `const totals = {};
-for (const row of rows) {
-  totals[row.product] = (totals[row.product] ?? 0) + row.revenue;
-}`,
-          output: "Decision complete: group by product and add revenue.\n\nIntermediate totals:\n- Widget A: 42000\n- Gadget B: 30000\n- Sprocket C: 12000",
-        },
-        {
-          id: "action",
-          label: "Add an action",
-          plain: "Return the answer in a form someone can use.",
-          code: `const top = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
-return ` + "`Top product: ${top[0]} ($${top[1]})`;",
-          output: "Top product: Widget A ($42000)\n\nNow the agent can complete the task end to end.",
-        },
-        {
-          id: "memory",
-          label: "Add memory",
-          plain: "Remember what was asked and how it was answered.",
-          code: `memory.push({
-  goal,
-  answer: "Top product: Widget A ($42000)",
-  usedTool: "codemode.listSales()",
-});`,
-          output: "Memory saved.\n\nThe next time someone asks about this sales table, the agent can explain what it did and what data it used.",
-        },
-      ],
-    },
-  },
-
-  labs: {
-    "agent-demo": {
-      id: "agent-demo",
-      language: "javascript",
-      runCmd: "node task.js",
-      files: [{ path: "task.js", language: "javascript", contents: starter }],
-      challenge: {
-        prompt: "Using codemode.listSales(), print: Top product: <name> ($<total revenue>).",
-        checks: [
-          { id: "calls-tool", describe: "Calls codemode.listSales()", expectSource: { file: "task.js", pattern: "codemode.listSales" } },
-          { id: "aggregates", describe: "Adds up the rows (a loop or reduce)", expectSource: { file: "task.js", pattern: "/(reduce|for ?\\()/" } },
-          { id: "prints-top", describe: "Prints the top product", expectStdout: "Top product" },
-        ],
-        solutionHint: solution,
-      },
-    },
-  },
-
-  sims: {
+  labs: {},
+  studios: {
     sales: {
       id: "sales",
+      title: "Agent Studio: a tiny sales agent",
+      intro: "Pick a goal, add capabilities, or ask the AI in plain English. Edit the code if you like, then run it for real in the Sandbox.",
       toolName: "codemode.listSales()",
-      predict: true,
+      toolCatalog: "codemode.listSales() -> Promise<Array<{ product: string, region: string, revenue: number }>>",
+      aiEnabled: true,
       toolPreview: {
         columns: ["product", "region", "revenue"],
         rows: [
@@ -229,52 +143,17 @@ return ` + "`Top product: ${top[0]} ($${top[1]})`;",
           ["Sprocket C", "EU", 12000],
         ],
       },
+      starterProgram,
+      capabilities: [
+        { id: "load", label: "Load the sales data", plain: "Call the tool to read the rows.", insert: "  const rows = await codemode.listSales();" },
+        { id: "group", label: "Total revenue per product", plain: "Add up revenue grouped by product.", insert: "  const totals = {};\n  for (const r of rows) totals[r.product] = (totals[r.product] ?? 0) + r.revenue;" },
+        { id: "top", label: "Find the highest", plain: "Sort and take the top entry.", insert: "  const top = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];" },
+        { id: "print", label: "Show the answer", plain: "Print the result.", insert: '  console.log("Top product: " + top[0] + " ($" + top[1] + ")");' },
+      ],
       goals: [
-        {
-          id: "top-product",
-          label: "Find the top product by revenue",
-          toolName: "codemode.listSales()",
-          program: solution,
-          steps: [
-            "Read the goal: find the product with the most revenue.",
-            "Decide the needed tool: sales rows.",
-            "Call codemode.listSales() to get the table.",
-            "Add revenue for each product.",
-            "Return the highest product and its total.",
-          ],
-          chatbotGuess: "Widget A is probably popular, so it might be the top product.",
-          expectedAnswer: "Top product: Widget A ($42000)",
-        },
-        {
-          id: "top-region",
-          label: "Find the top region by revenue",
-          toolName: "codemode.listSales()",
-          program: topRegionProgram,
-          steps: [
-            "Read the goal: find which region sold the most.",
-            "Decide the needed tool: sales rows grouped by region.",
-            "Call codemode.listSales() to get the table.",
-            "Add revenue for each region.",
-            "Return the highest region and its total.",
-          ],
-          chatbotGuess: "EU is a large market, so it may be the top region.",
-          expectedAnswer: "Top region: NA ($55000)",
-        },
-        {
-          id: "total-revenue",
-          label: "Calculate total revenue",
-          toolName: "codemode.listSales()",
-          program: totalRevenueProgram,
-          steps: [
-            "Read the goal: calculate total revenue.",
-            "Decide the needed tool: all sales rows.",
-            "Call codemode.listSales() to get the table.",
-            "Add every revenue value together.",
-            "Return the final total.",
-          ],
-          chatbotGuess: "The total is likely around $75,000 based on the table size.",
-          expectedAnswer: "Total revenue: $84000",
-        },
+        { id: "top-product", label: "Find the top product by revenue", program: topProductProgram, chatbotGuess: "Widget A is probably popular, so maybe that one." },
+        { id: "top-region", label: "Find the top region by revenue", program: topRegionProgram, chatbotGuess: "EU is a big market, so likely EU." },
+        { id: "total-revenue", label: "Calculate total revenue", program: totalRevenueProgram, chatbotGuess: "Around $75,000 based on the table size." },
       ],
     },
   },
@@ -297,14 +176,14 @@ return ` + "`Top product: ${top[0]} ($${top[1]})`;",
       id: "do-i-need-code",
       question: "Do you need to write code to understand what this agent is doing?",
       options: [
-        "No. You can understand the goal, tool, decision, and answer first; code view is optional.",
+        "No. You can pick a goal, add steps, or ask in English; editing code is optional.",
         "Yes. Agents only make sense if you can write TypeScript.",
         "Yes. Agents cannot work with business data.",
         "No, because agents do not use tools.",
       ],
       answerIndex: 0,
       explanation:
-        "For analysts and finance users, the concept view is enough to understand the workflow. Code view exists for people who want to inspect or build the implementation.",
+        "For analysts and finance users, clicking goals/steps or asking the AI in plain English is enough to build and run an agent. The editor is there for people who want it.",
     },
     "agent-vs-chatbot": {
       id: "agent-vs-chatbot",
@@ -324,7 +203,7 @@ return ` + "`Top product: ${top[0]} ($${top[1]})`;",
   recap: [
     "An agent remembers, decides, uses tools, and acts toward a goal.",
     "That's different from a chatbot, which just replies once and forgets.",
-    "You watched a real agent read data and report an answer — no code required.",
+    "You built and ran a real agent — by clicking, by asking in English, or by editing code.",
   ],
   next: { slug: "your-first-agent", label: "Build your first agent" },
 

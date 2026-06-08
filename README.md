@@ -74,13 +74,16 @@ Deployed live via `--env production` (Workers Paid):
 | Piece | Status |
 | --- | --- |
 | Design tokens / layout | Real (vendored marketing-site tokens) |
-| Tutor | **Live** — Workers AI (`@cf/meta/llama-3.1-8b-instruct`), grounded in lesson content, plain-language + injection guardrails |
-| Python lab | **Real** — runs Python 3.11 in a `@cloudflare/sandbox` container |
-| Code Mode + reconcile labs | **Real** — run on Node in the container via a `codemode.*` harness |
-| Greeter lab | Labeled mock (a full `wrangler dev` server per click isn't practical) |
+| Tutor | **Live** — Workers AI (`@cf/meta/llama-3.3-70b-instruct-fp8-fast`), grounded in lesson content, plain-language + injection guardrails |
+| Agent Studio (Foundation) | **Real** — build by clicking, ask the AI to write code, edit, and run JS for real in a per-session `@cloudflare/sandbox` container |
+| Python / Code Mode / reconcile labs | **Real** — run Python 3.11 or Node in the container |
+| AI codegen (`/api/ai-code`) | **Live** — Workers AI, constrained to the lesson's `codemode.*` tools, output denylist-validated |
 | Progress | localStorage (D1 swap-point documented) |
 
-Local dev (`astro dev`, top-level env) stays fully offline/mock so you can work without spend.
+Runner hardening: per-session sandbox IDs, a 10s execution timeout, and a server-side
+denylist (no `fetch`/`import`/`require`/`process`/network) — applied to all learner and
+AI-generated code. Local dev (`astro dev`) stays offline/mock; real execution runs in the
+deployed environment (or via `wrangler dev` with remote bindings).
 
 ## Architecture: two Workers
 

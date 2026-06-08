@@ -29,6 +29,7 @@ export function createSandboxRunner(service: { fetch: typeof fetch }): Runner {
             language: lab.language,
             runCmd: lab.runCmd,
             files: req.files,
+            sessionId: req.sessionId,
           }),
         });
         const data = (await res.json()) as {

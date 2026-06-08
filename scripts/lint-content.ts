@@ -38,6 +38,7 @@ async function lintLesson(l: Lesson) {
     if (b.kind === "watch" && !l.labs[b.labId]) fail(l.slug, `watch references missing lab '${b.labId}'`);
     if (b.kind === "agentSim" && !l.sims?.[b.simId]) fail(l.slug, `agentSim references missing sim '${b.simId}'`);
     if (b.kind === "agentBuilder" && !l.builders?.[b.builderId]) fail(l.slug, `agentBuilder references missing builder '${b.builderId}'`);
+    if (b.kind === "agentStudio" && !l.studios?.[b.studioId]) fail(l.slug, `agentStudio references missing studio '${b.studioId}'`);
     if (b.kind === "quiz" && !l.quizzes[b.quizId]) fail(l.slug, `quiz references missing quiz '${b.quizId}'`);
   }
 
@@ -66,6 +67,21 @@ async function lintLesson(l: Lesson) {
       if (!step.plain.trim()) fail(l.slug, `builder '${builder.id}' step '${step.id}' missing plain-language explanation`);
       if (!step.code.trim()) fail(l.slug, `builder '${builder.id}' step '${step.id}' missing code`);
       if (!step.output.trim()) fail(l.slug, `builder '${builder.id}' step '${step.id}' missing run output`);
+    }
+  }
+
+  // ── AgentStudio integrity (unified build + run interactive) ──
+  for (const studio of Object.values(l.studios ?? {})) {
+    if (!studio.title.trim()) fail(l.slug, `studio '${studio.id}' missing title`);
+    if (!studio.toolCatalog.trim()) fail(l.slug, `studio '${studio.id}' missing toolCatalog (needed for AI codegen)`);
+    if (!studio.starterProgram.trim()) fail(l.slug, `studio '${studio.id}' missing starterProgram`);
+    if (studio.toolPreview.columns.length < 1 || studio.toolPreview.rows.length < 1) {
+      fail(l.slug, `studio '${studio.id}' needs a visible toolPreview table`);
+    }
+    if (studio.capabilities.length < 2) fail(l.slug, `studio '${studio.id}' needs at least 2 capabilities`);
+    if (studio.goals.length < 1) fail(l.slug, `studio '${studio.id}' needs at least one goal`);
+    for (const g of studio.goals) {
+      if (!g.program.includes("export default")) fail(l.slug, `studio '${studio.id}' goal '${g.id}' program must export a default function`);
     }
   }
 

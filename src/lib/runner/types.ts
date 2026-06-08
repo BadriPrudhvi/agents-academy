@@ -10,6 +10,8 @@ export interface RunRequest {
    * "see it in action" for non-technical learners).
    */
   action: "run" | "check" | "demo";
+  /** Per-learner session id for isolated container execution. */
+  sessionId?: string;
 }
 
 export interface RunResult {
