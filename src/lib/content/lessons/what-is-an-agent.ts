@@ -76,21 +76,24 @@ export const whatIsAnAgent: Lesson = {
     { kind: "heading", text: "What makes something an agent?", id: "what" },
     {
       kind: "prose",
-      text: "An **AI agent** is software that can pursue a goal: it can **remember** what's happened, **decide** what to do next, **use tools** (like looking up data or calling a service), and **act** — repeating until the job is done. A plain chatbot just replies to one message; an agent gets things done.",
+      text: "An **AI agent** is a **model** (the brain) wired into a **loop** with **tools**. Given a goal, the model **decides** what to do, **calls a tool** to act or fetch data, **reads the result**, and repeats until it can **answer** — grounded in what it found. A plain chatbot just replies from memory; an agent decides, uses tools, and gets things done.",
     },
     {
       kind: "diagram",
-      title: "How an agent works",
+      title: "The agent loop: model + tools",
       nodes: [
-        { id: "goal", label: "Your goal", tone: "user", x: 0, y: 110 },
-        { id: "agent", label: "Agent: remember · decide · act", tone: "agent", x: 240, y: 110 },
-        { id: "tools", label: "Tools & data", tone: "tool", x: 510, y: 30 },
-        { id: "result", label: "Result", tone: "state", x: 510, y: 190 },
+        { id: "goal", label: "Your goal", tone: "user", x: 0, y: 120 },
+        { id: "agent", label: "Agent (the loop)", tone: "agent", x: 230, y: 120 },
+        { id: "model", label: "Model — decides", tone: "model", x: 500, y: 20 },
+        { id: "tools", label: "Tools — act / fetch", tone: "tool", x: 500, y: 130 },
+        { id: "result", label: "Answer", tone: "state", x: 500, y: 240 },
       ],
       edges: [
-        { from: "goal", to: "agent" },
-        { from: "agent", to: "tools", label: "look things up" },
-        { from: "agent", to: "result", label: "deliver" },
+        { from: "goal", to: "agent", label: "goal" },
+        { from: "agent", to: "model", label: "1 · think" },
+        { from: "agent", to: "tools", label: "2 · act" },
+        { from: "tools", to: "agent", label: "3 · observe (loop)" },
+        { from: "agent", to: "result", label: "4 · answer" },
       ],
     },
     {
@@ -112,12 +115,19 @@ export const whatIsAnAgent: Lesson = {
       text: "An agent is software that remembers, decides, and acts toward a goal — using tools and data along the way.",
     },
 
-    { kind: "heading", text: "Build and run your own agent", id: "studio" },
+    { kind: "heading", text: "Watch a real agent work", id: "agent" },
     {
       kind: "prose",
-      text: "Now make one. Pick a goal, add capabilities, or just **ask in plain English** and let the AI write the code. Then press **Run in Sandbox** to execute it for real and see the answer. No coding required — but the editor is yours if you want it.",
+      audience: "concept",
+      text: "Here is an actual agent — a **model** with one **tool** (`getSales`). Give it a goal in plain English. Watch it **decide** to call the tool, **read** the real data, and **answer** from it. That decide → act → observe → answer loop is the agent. Notice it never guesses the numbers; it fetches them.",
     },
-    { kind: "agentStudio", studioId: "sales" },
+    { kind: "agentRun", runId: "sales", audience: "concept" },
+    {
+      kind: "prose",
+      audience: "code",
+      text: "Prefer code? Below is the agent's tool surface as an editable program. Edit it, ask the AI to extend it, and **Run in Sandbox** for real. In Track 1 you'll wrap this exact pattern — model + tools + loop — in the Agents SDK `Agent` class.",
+    },
+    { kind: "agentStudio", studioId: "sales", audience: "code" },
 
     { kind: "heading", text: "Check your understanding", id: "check" },
     { kind: "quiz", quizId: "agent-vs-chatbot" },
@@ -153,6 +163,20 @@ export const whatIsAnAgent: Lesson = {
         { id: "top-product", label: "Find the top product by revenue", program: topProductProgram, chatbotGuess: "Widget A is probably popular, so maybe that one." },
         { id: "top-region", label: "Find the top region by revenue", program: topRegionProgram, chatbotGuess: "EU is a big market, so likely EU." },
         { id: "total-revenue", label: "Calculate total revenue", program: totalRevenueProgram, chatbotGuess: "Around $75,000 based on the table size." },
+      ],
+    },
+  },
+
+  agentRuns: {
+    sales: {
+      id: "sales",
+      intro: "A real agent: a model with one tool. Give it a goal — it decides to call the tool, reads the data, and answers.",
+      model: "GLM-4.7-Flash (Workers AI)",
+      tools: [{ name: "getSales", description: "Returns sales records (product, region, revenue)." }],
+      examples: [
+        "Which product made the most money?",
+        "Which region had the highest revenue?",
+        "What's our total revenue?",
       ],
     },
   },

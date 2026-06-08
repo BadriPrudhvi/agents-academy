@@ -10,6 +10,7 @@ import ViewToggle from "../../../components/interactive/ViewToggle.tsx";
 import AgentDiagram from "../../../components/interactive/AgentDiagram.tsx";
 import AgentBuilder from "../../../components/interactive/AgentBuilder.tsx";
 import AgentStudio from "../../../components/interactive/AgentStudio.tsx";
+import AgentRun from "../../../components/interactive/AgentRun.tsx";
 import AgentSim from "../../../components/interactive/AgentSim.tsx";
 import WatchItRun from "../../../components/interactive/WatchItRun.tsx";
 import LessonFeedback from "../../../components/interactive/LessonFeedback.tsx";
@@ -148,6 +149,17 @@ const calloutTone: Record<string, string> = {
                 title={lesson.builders[b.builderId].title}
                 intro={lesson.builders[b.builderId].intro}
                 steps={lesson.builders[b.builderId].steps}
+              />
+            )}
+            {b.kind === "agentRun" && lesson.agentRuns?.[b.runId] && (
+              <AgentRun
+                client:visible
+                lessonSlug={lesson.slug}
+                runId={lesson.agentRuns[b.runId].id}
+                intro={lesson.agentRuns[b.runId].intro}
+                model={lesson.agentRuns[b.runId].model}
+                tools={lesson.agentRuns[b.runId].tools}
+                examples={lesson.agentRuns[b.runId].examples}
               />
             )}
             {b.kind === "agentStudio" && lesson.studios?.[b.studioId] && (

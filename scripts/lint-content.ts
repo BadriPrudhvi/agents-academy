@@ -39,6 +39,7 @@ async function lintLesson(l: Lesson) {
     if (b.kind === "agentSim" && !l.sims?.[b.simId]) fail(l.slug, `agentSim references missing sim '${b.simId}'`);
     if (b.kind === "agentBuilder" && !l.builders?.[b.builderId]) fail(l.slug, `agentBuilder references missing builder '${b.builderId}'`);
     if (b.kind === "agentStudio" && !l.studios?.[b.studioId]) fail(l.slug, `agentStudio references missing studio '${b.studioId}'`);
+    if (b.kind === "agentRun" && !l.agentRuns?.[b.runId]) fail(l.slug, `agentRun references missing agentRun '${b.runId}'`);
     if (b.kind === "quiz" && !l.quizzes[b.quizId]) fail(l.slug, `quiz references missing quiz '${b.quizId}'`);
   }
 
@@ -83,6 +84,14 @@ async function lintLesson(l: Lesson) {
     for (const g of studio.goals) {
       if (!g.program.includes("export default")) fail(l.slug, `studio '${studio.id}' goal '${g.id}' program must export a default function`);
     }
+  }
+
+  // ── AgentRun integrity (real model+tools loop) ──
+  for (const run of Object.values(l.agentRuns ?? {})) {
+    if (!run.intro.trim()) fail(l.slug, `agentRun '${run.id}' missing intro`);
+    if (!run.model.trim()) fail(l.slug, `agentRun '${run.id}' missing model`);
+    if (run.tools.length < 1) fail(l.slug, `agentRun '${run.id}' needs at least one tool`);
+    if (run.examples.length < 1) fail(l.slug, `agentRun '${run.id}' needs at least one example goal`);
   }
 
   // ── Quiz integrity ──

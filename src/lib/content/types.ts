@@ -45,6 +45,7 @@ export type Block = ({ audience?: Audience }) & (
   | { kind: "agentSim"; simId: string } // no-code interactive: drive an agent, watch the loop
   | { kind: "agentBuilder"; builderId: string } // no-code builder: add capabilities one by one
   | { kind: "agentStudio"; studioId: string } // unified: build + edit + AI codegen + run for real
+  | { kind: "agentRun"; runId: string } // a REAL agent loop: model decides -> tool -> observe -> answer
   | { kind: "codelab"; labId: string } // anchors the interactive island
   | { kind: "quiz"; quizId: string }
 );
@@ -135,6 +136,18 @@ export interface AgentStudio {
   aiEnabled?: boolean;
 }
 
+/* ── Agent Run: a real model+tools loop the learner drives in plain English ── */
+export interface AgentRun {
+  id: string;
+  intro: string;
+  /** The model that powers the agent (display only). */
+  model: string;
+  /** Tools the agent can choose to call (display only; execution is server-side). */
+  tools: { name: string; description: string }[];
+  /** Example goals the learner can click to try. */
+  examples: string[];
+}
+
 export type CodeLanguage = "typescript" | "javascript" | "python" | "json" | "jsonc" | "toml";
 
 /** A single file in the interactive lab's editor. */
@@ -212,6 +225,7 @@ export interface Lesson {
   sims?: Record<string, AgentSim>;
   builders?: Record<string, AgentBuilder>;
   studios?: Record<string, AgentStudio>;
+  agentRuns?: Record<string, AgentRun>;
 
   recap: string[];
   next?: { slug: string; label: string };
