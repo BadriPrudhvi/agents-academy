@@ -1,0 +1,60 @@
+---
+import Base from "../../layouts/Base.astro";
+import { TRACKS, lessonsForTrack } from "../../lib/content";
+import { Lock, ArrowRight, Clock } from "@phosphor-icons/react";
+---
+
+<Base title="Learn" description="The Agents Academy curriculum.">
+  <div class="mx-auto max-w-6xl px-6 py-14">
+    <h1 class="text-3xl md:text-4xl">Curriculum</h1>
+    <p class="mt-3 max-w-2xl text-foreground-200">
+      Eight tracks, from your first agent to production. Start anywhere — lessons list their
+      prerequisites. One lesson is fully interactive today; the rest are on the way.
+    </p>
+
+    <div class="mt-10 space-y-12">
+      {TRACKS.map((track) => {
+        const lessons = lessonsForTrack(track.id);
+        return (
+          <section id={track.id} class="scroll-mt-20">
+            <div class="flex items-baseline gap-3">
+              <span class="font-mono text-xs text-text-secondary">Track {track.order}</span>
+              <h2 class="text-2xl" style={`color: var(--color-${track.accent}-100)`}>{track.title}</h2>
+            </div>
+            <p class="mt-1 text-foreground-200">{track.blurb}</p>
+            <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {lessons.map((l) =>
+                l.available ? (
+                  <a
+                    href={`/learning/${l.trackId}/${l.slug}`}
+                    class="group relative rounded-xl border border-border-100 bg-background-content p-4 transition-colors hover:border-accent-100"
+                  >
+                    <span class="absolute left-3 top-3 h-1.5 w-1.5 bg-accent-100"></span>
+                    <p class="pl-3 font-medium text-foreground-100">{l.title}</p>
+                    <p class="mt-1 text-sm text-foreground-200">{l.summary}</p>
+                    <div class="mt-3 flex items-center gap-3 text-xs text-text-secondary">
+                      {l.timeEstimateMin && (
+                        <span class="inline-flex items-center gap-1"><Clock size={12} /> {l.timeEstimateMin} min</span>
+                      )}
+                      <span class="ml-auto inline-flex items-center gap-1 text-accent-muted">
+                        Start <ArrowRight size={12} weight="bold" />
+                      </span>
+                    </div>
+                  </a>
+                ) : (
+                  <div class="rounded-xl border border-dashed border-border-100 p-4 opacity-70">
+                    <p class="flex items-center gap-1.5 font-medium text-text-secondary">
+                      <Lock size={13} /> {l.title}
+                    </p>
+                    <p class="mt-1 text-sm text-text-tertiary">{l.summary}</p>
+                    <p class="mt-3 font-mono text-[11px] uppercase tracking-wider text-text-tertiary">Coming soon</p>
+                  </div>
+                ),
+              )}
+            </div>
+          </section>
+        );
+      })}
+    </div>
+  </div>
+</Base>

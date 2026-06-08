@@ -1,0 +1,72 @@
+---
+import Base from "../layouts/Base.astro";
+import { TRACKS, curriculumStats } from "../lib/content";
+import RolePicker from "../components/interactive/RolePicker.tsx";
+const stats = curriculumStats();
+const parts = [
+  { t: "Channels", d: "chat, voice, email, Slack, webhooks" },
+  { t: "Harness", d: "Project Think or your own loop" },
+  { t: "Runtime", d: "state, sessions, scheduling, fibers" },
+  { t: "Tools", d: "browser, sandbox, MCP, payments" },
+];
+---
+
+<Base title="Build AI agents on Cloudflare" dataType="hero">
+  <section class="relative mx-auto max-w-6xl px-6 pt-20 pb-16">
+    <span class="mb-5 inline-flex items-center gap-2 rounded-full bg-ai-200 px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-ai-100">
+      Interactive course
+    </span>
+    <h1 class="max-w-3xl text-balance">Go from zero to shipping AI agents on Cloudflare.</h1>
+    <p class="mt-5 max-w-2xl text-lg text-foreground-200">
+      Learn by building. Every lesson runs real code in your browser, grades your work, and a
+      grounded tutor is one question away. Built end-to-end on the Cloudflare developer platform.
+    </p>
+    <div class="mt-8 flex flex-wrap items-center gap-3">
+      <a href="/learning" class="rounded-md bg-accent-100 px-5 py-2.5 text-light-foreground">Start learning</a>
+      <a href="/learning/first-agent/your-first-agent" class="rounded-md border border-border-100 px-5 py-2.5 text-foreground-100 hover:border-foreground-300">
+        Try the first lesson
+      </a>
+    </div>
+    <p class="mt-6 font-mono text-xs text-text-secondary">
+      {stats.tracks} tracks · {stats.authored} lesson live · {stats.planned} planned
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-6 pb-8">
+    <h2 class="text-2xl">Pick your starting point</h2>
+    <p class="mt-2 text-foreground-200">
+      We tailor every lesson to your background — concepts first if you don't code, hands-on if you do.
+      You can change this anytime in the header.
+    </p>
+    <div class="mt-6">
+      <RolePicker client:load variant="grid" />
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-6 pb-8 pt-8">
+    <h2 class="text-2xl">The shape of every agent</h2>
+    <p class="mt-2 text-foreground-200">The course is organized around the four parts Cloudflare agents are built from.</p>
+    <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {parts.map((p, i) => (
+        <div class="relative rounded-xl border border-border-100 bg-background-content p-5">
+          <span class="absolute left-3 top-3 h-1.5 w-1.5 bg-accent-100"></span>
+          <span class="absolute right-3 top-3 h-1.5 w-1.5 bg-accent-100/40"></span>
+          <p class="font-mono text-xs text-text-secondary">0{i + 1}</p>
+          <h3 class="mt-1 text-lg">{p.t}</h3>
+          <p class="mt-1 text-sm text-foreground-200">{p.d}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-6 py-10">
+    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {TRACKS.map((t) => (
+        <a href={`/learning#${t.id}`} class="rounded-lg border border-border-100 px-4 py-3 text-sm hover:border-foreground-300">
+          <span class="font-mono text-xs text-text-secondary">Track {t.order}</span>
+          <p class="mt-0.5 font-medium">{t.title}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+</Base>

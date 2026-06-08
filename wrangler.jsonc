@@ -1,0 +1,58 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "agents-academy",
+  // @astrojs/cloudflare emits the SSR worker here; static assets served from ./dist.
+  "main": "./dist/_worker.js/index.js",
+  "compatibility_date": "2025-05-25",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    // Runner mode: "mock" (local, no cost) | "sandbox" (real Containers). Flagged per Spike B gate.
+    "RUNNER_MODE": "mock",
+    // Tutor mode: "mock" (canned, no cost) | "live" (Workers AI via AI Gateway + AutoRAG).
+    "TUTOR_MODE": "mock"
+  },
+
+  // NOTE: the AI binding is remote-only and forces `platformProxy` into remote
+  // mode (requires `wrangler login`). The MVP runs in mock mode, so AI is scoped
+  // to env.production below. Add it back here once you've run `wrangler login`.
+
+  // ── Net-new agent runtime — uncomment + provision once Workers Paid creds are in ──
+  // "d1_databases": [
+  //   { "binding": "DB", "database_name": "agents-academy", "database_id": "<id>" }
+  // ],
+  // "kv_namespaces": [
+  //   { "binding": "CACHE", "id": "<id>" }
+  // ],
+  // "r2_buckets": [
+  //   { "binding": "ARTIFACTS", "bucket_name": "agents-academy-artifacts" }
+  // ],
+  // "vectorize": [
+  //   { "binding": "VECTORIZE", "index_name": "agents-docs" }
+  // ],
+  // "durable_objects": {
+  //   "bindings": [
+  //     { "name": "SANDBOX", "class_name": "AcademySandbox" },
+  //     { "name": "TUTOR", "class_name": "TutorAgent" },
+  //     { "name": "RUNNER_LIMITER", "class_name": "RunnerLimiter" }
+  //   ]
+  // },
+
+  "env": {
+    "staging": {
+      "name": "agents-academy-stg",
+      "vars": { "RUNNER_MODE": "mock", "TUTOR_MODE": "mock" }
+    },
+    "production": {
+      "name": "agents-academy",
+      "vars": { "RUNNER_MODE": "sandbox", "TUTOR_MODE": "live" },
+      "ai": { "binding": "AI" }
+    }
+  }
+}

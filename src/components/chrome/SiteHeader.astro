@@ -1,0 +1,29 @@
+---
+import ThemeToggle from "./ThemeToggle.tsx";
+import RolePicker from "../interactive/RolePicker.tsx";
+---
+
+<header class="sticky top-0 z-40 border-b border-border-100 bg-background-100/85 backdrop-blur">
+  <div class="mx-auto max-w-6xl px-6 h-14 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2 font-medium tracking-tight">
+      <span class="inline-grid grid-cols-2 gap-[2px]" aria-hidden="true">
+        <span class="h-2 w-2 bg-accent-100"></span>
+        <span class="h-2 w-2 bg-accent-100/40"></span>
+        <span class="h-2 w-2 bg-accent-100/40"></span>
+        <span class="h-2 w-2 bg-accent-100"></span>
+      </span>
+      Agents Academy
+    </a>
+    <nav class="flex items-center gap-6 text-sm">
+      <a href="/learning" class="text-foreground-200 hover:text-accent-muted transition-colors">Learn</a>
+      <a
+        href="https://developers.cloudflare.com/agents/"
+        class="hidden text-foreground-200 hover:text-accent-muted transition-colors sm:inline"
+        target="_blank"
+        rel="noreferrer">Docs</a
+      >
+      <RolePicker client:load variant="compact" />
+      <ThemeToggle client:load />
+    </nav>
+  </div>
+</header>

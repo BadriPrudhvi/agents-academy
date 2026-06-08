@@ -1,0 +1,44 @@
+---
+import "../global.css";
+import SiteHeader from "../components/chrome/SiteHeader.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  dataType?: "hero" | "compact";
+}
+const { title, description = "Learn to build AI agents on Cloudflare.", dataType } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} · Agents Academy</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" />
+    {/* Set theme before paint to avoid a flash. */}
+    <script is:inline>
+      (() => {
+        try {
+          const t = localStorage.getItem("theme");
+          const dark = t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+          if (dark) document.documentElement.classList.add("dark");
+        } catch {}
+      })();
+    </script>
+  </head>
+  <body data-type={dataType}>
+    <SiteHeader />
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="border-t border-border-100 mt-24">
+      <div class="mx-auto max-w-6xl px-6 py-10 flex flex-wrap items-center justify-between gap-4 text-sm text-text-secondary">
+        <p>Agents Academy — an independent, open learning project. Built on Cloudflare.</p>
+        <p class="font-mono text-xs">Design system mirrors cloudflare/fe/marketing-site</p>
+      </div>
+    </footer>
+  </body>
+</html>
