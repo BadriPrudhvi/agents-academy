@@ -64,7 +64,7 @@ async function liveTutor(question: string, lesson: NonNullable<ReturnType<typeof
     `Common misconceptions: ${lesson.misconceptions.map((m) => `"${m.belief}" -> ${m.correction}`).join(" | ")}`,
   ].join("\n");
 
-  const result = await ai.run("@cf/meta/llama-3.1-8b-instruct", {
+  const result = await ai.run("@cf/meta/llama-3.3-70b-instruct-fp8-fast", {
     messages: [
       { role: "system", content: system },
       { role: "user", content: question.slice(0, 2000) },
@@ -106,7 +106,7 @@ function groundedMock(question: string, lesson: ReturnType<typeof getLesson>): T
       "State lives on the agent's Durable Object. Use this.setState(...) to persist it — it survives across requests with no external database.";
   } else if (q.includes("model") || q.includes("ai") || q.includes("llm")) {
     body =
-      "Call the model from inside the agent with this.env.AI.run(\"@cf/meta/llama-3.1-8b-instruct\", { messages: [...] }) and read the `response` field.";
+      "Call the model from inside the agent with this.env.AI.run(\"@cf/meta/llama-3.3-70b-instruct-fp8-fast\", { messages: [...] }) and read the `response` field.";
   } else {
     body = `For this lesson, focus on the outcomes: ${l.outcomes.join("; ")}.`;
   }

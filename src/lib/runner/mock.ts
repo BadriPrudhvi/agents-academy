@@ -46,27 +46,9 @@ const SIMULATORS: Record<string, Simulator> = {
     ].join("\n");
   },
 
-  // Lesson: agents-write-code / lab: codemode-sales
-  "codemode-sales"(files) {
-    const raw = files.find((f) => f.path === "task.js")?.contents ?? "";
-    const src = stripComments(raw);
-    const callsTool = src.includes("codemode.listSales");
-    const aggregates = /(reduce|for ?\()/.test(src);
-
-    if (callsTool && aggregates) {
-      return [
-        "$ code-mode run task.js",
-        "→ executing generated code in secure sandbox (no secret access)",
-        "→ codemode.listSales() → 6 rows",
-        "Top product: Widget A ($42,000)",
-      ].join("\n");
-    }
-    return [
-      "$ code-mode run task.js",
-      "→ executing generated code in secure sandbox",
-      callsTool ? "(got rows, but nothing aggregated yet)" : "(no codemode.listSales() call yet)",
-    ].join("\n");
-  },
+  // Lessons: agents-write-code (codemode-sales) + foundations (agent-demo) — same shape.
+  "codemode-sales": codemodeSalesSim,
+  "agent-demo": codemodeSalesSim,
 
   // Lesson: finance-reconciliation / lab: reconcile
   reconcile(files) {
@@ -105,6 +87,24 @@ const SIMULATORS: Record<string, Simulator> = {
     ].join("\n");
   },
 };
+
+function codemodeSalesSim(files: { path: string; contents: string }[]): string {
+  const src = stripComments(files.find((f) => f.path === "task.js")?.contents ?? "");
+  const callsTool = src.includes("codemode.listSales");
+  const aggregates = /(reduce|for ?\()/.test(src);
+  if (callsTool && aggregates) {
+    return [
+      "$ run task.js",
+      "→ executing generated code in secure sandbox (no secret access)",
+      "→ codemode.listSales() → 4 rows",
+      "Top product: Widget A ($42000)",
+    ].join("\n");
+  }
+  return [
+    "$ run task.js",
+    callsTool ? "(got rows, but nothing aggregated yet)" : "(no codemode.listSales() call yet)",
+  ].join("\n");
+}
 
 function genericSimulate(files: { path: string; contents: string }[]): string {
   const entry = files[0];

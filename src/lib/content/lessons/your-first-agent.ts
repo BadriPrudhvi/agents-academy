@@ -37,7 +37,7 @@ export class Greeter extends Agent<Env, State> {
     const { name } = await request.json<{ name: string }>();
 
     // TODO 1: call Workers AI to generate a one-line greeting for \`name\`.
-    //   Use this.env.AI.run("@cf/meta/llama-3.1-8b-instruct", { messages: [...] })
+    //   Use this.env.AI.run("@cf/meta/llama-3.3-70b-instruct-fp8-fast", { messages: [...] })
     //   and read the \`response\` field.
 
     // TODO 2: increment this.state.greetings using this.setState(...).
@@ -67,7 +67,7 @@ export class Greeter extends Agent<Env, State> {
     const { name } = await request.json<{ name: string }>();
 
     const { response } = await this.env.AI.run(
-      "@cf/meta/llama-3.1-8b-instruct",
+      "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
       {
         messages: [
           { role: "system", content: "You greet people in one short, warm line." },

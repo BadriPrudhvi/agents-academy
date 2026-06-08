@@ -8,6 +8,8 @@ import TutorPanel from "../../../components/interactive/tutor/TutorPanel.tsx";
 import LessonProgress from "../../../components/interactive/LessonProgress.tsx";
 import ViewToggle from "../../../components/interactive/ViewToggle.tsx";
 import AgentDiagram from "../../../components/interactive/AgentDiagram.tsx";
+import WatchItRun from "../../../components/interactive/WatchItRun.tsx";
+import LessonFeedback from "../../../components/interactive/LessonFeedback.tsx";
 import { Clock, Target, ListChecks } from "@phosphor-icons/react";
 
 const { track: trackId, lesson: slug } = Astro.params;
@@ -117,6 +119,9 @@ const calloutTone: Record<string, string> = {
             {b.kind === "diagram" && (
               <AgentDiagram client:visible title={b.title} nodes={b.nodes} edges={b.edges} />
             )}
+            {b.kind === "watch" && lesson.labs[b.labId] && (
+              <WatchItRun client:visible lessonSlug={lesson.slug} labId={b.labId} caption={b.caption} />
+            )}
             {b.kind === "codelab" && lesson.labs[b.labId] && (
               <CodeLab
                 client:visible
@@ -156,6 +161,8 @@ const calloutTone: Record<string, string> = {
             </a>
           )}
         </div>
+
+        <LessonFeedback client:visible lessonSlug={lesson.slug} />
       </div>
 
       {/* TOC sidebar */}

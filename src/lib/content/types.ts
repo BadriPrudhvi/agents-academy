@@ -41,6 +41,7 @@ export type Block = ({ audience?: Audience }) & (
   | { kind: "list"; ordered?: boolean; items: string[] }
   | { kind: "diagram"; title?: string; nodes: DiagramNode[]; edges: DiagramEdge[] }
   | { kind: "analogy"; role: string; text: string } // role-tailored framing
+  | { kind: "watch"; labId: string; caption?: string } // no-code "see it run" (runs the solution)
   | { kind: "codelab"; labId: string } // anchors the interactive island
   | { kind: "quiz"; quizId: string }
 );

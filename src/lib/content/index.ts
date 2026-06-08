@@ -1,5 +1,6 @@
 import type { Lesson } from "./types";
 import { TRACKS, getTrack } from "./tracks";
+import { whatIsAnAgent } from "./lessons/what-is-an-agent";
 import { yourFirstAgent } from "./lessons/your-first-agent";
 import { agentsWriteCode } from "./lessons/agents-write-code";
 import { firstDataAgent } from "./lessons/first-data-agent";
@@ -9,7 +10,7 @@ export type { Lesson, Track } from "./types";
 export { TRACKS, getTrack };
 
 /** Fully authored, runnable lessons. */
-const LESSONS: Lesson[] = [yourFirstAgent, agentsWriteCode, firstDataAgent, financeReconciliation];
+const LESSONS: Lesson[] = [whatIsAnAgent, yourFirstAgent, agentsWriteCode, firstDataAgent, financeReconciliation];
 
 /** Lightweight card for the hub (authored lessons + "coming soon" placeholders). */
 export interface LessonCard {
@@ -24,7 +25,6 @@ export interface LessonCard {
 
 /** Outline of the rest of the curriculum, shown as locked cards on the hub. */
 const COMING_SOON: Omit<LessonCard, "available">[] = [
-  { trackId: "foundations", slug: "what-is-an-agent", order: 1, title: "What is an agent?", summary: "Generative vs. agentic, and the Workers edge model." },
   { trackId: "foundations", slug: "first-worker", order: 2, title: "Your first Worker", summary: "Wrangler, bindings, and a live deploy." },
   { trackId: "first-agent", slug: "streaming-chat", order: 2, title: "Stream responses to a chat UI", summary: "WebSockets, useAgent, and token streaming." },
   { trackId: "first-agent", slug: "agent-harness", order: 3, title: "Project Think vs. your own loop", summary: "Opinionated harness or build the loop yourself." },

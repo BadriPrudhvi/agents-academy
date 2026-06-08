@@ -4,8 +4,12 @@ export interface RunRequest {
   lessonSlug: string;
   labId: string;
   files: { path: string; contents: string }[];
-  /** "run" just executes; "check" executes then grades against hidden checks. */
-  action: "run" | "check";
+  /**
+   * "run" executes the learner's files; "check" runs + grades; "demo" runs the
+   * reference solution server-side (no code required — powers the no-code
+   * "see it in action" for non-technical learners).
+   */
+  action: "run" | "check" | "demo";
 }
 
 export interface RunResult {
