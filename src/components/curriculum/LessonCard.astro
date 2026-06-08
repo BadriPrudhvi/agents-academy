@@ -1,0 +1,41 @@
+---
+import { Lock, ArrowRight, Clock } from "@phosphor-icons/react";
+import type { LessonCard } from "../../lib/content";
+
+interface Props {
+  lesson: LessonCard;
+}
+
+const { lesson: l } = Astro.props;
+---
+
+{
+  l.available ? (
+    <a
+      href={`/learning/${l.trackId}/${l.slug}`}
+      class="group relative rounded-xl border border-border-100 bg-background-content p-4 transition-colors hover:border-accent-100"
+    >
+      <span class="absolute left-3 top-3 h-1.5 w-1.5 bg-accent-100" />
+      <p class="pl-3 font-medium text-foreground-100">{l.title}</p>
+      <p class="mt-1 text-sm text-foreground-200">{l.summary}</p>
+      <div class="mt-3 flex items-center gap-3 text-xs text-text-secondary">
+        {l.timeEstimateMin && (
+          <span class="inline-flex items-center gap-1">
+            <Clock size={12} /> {l.timeEstimateMin} min
+          </span>
+        )}
+        <span class="ml-auto inline-flex items-center gap-1 text-accent-muted">
+          Start <ArrowRight size={12} weight="bold" />
+        </span>
+      </div>
+    </a>
+  ) : (
+    <div class="rounded-xl border border-dashed border-border-100 p-4 opacity-70">
+      <p class="flex items-center gap-1.5 font-medium text-text-secondary">
+        <Lock size={13} /> {l.title}
+      </p>
+      <p class="mt-1 text-sm text-text-tertiary">{l.summary}</p>
+      <p class="mt-3 font-mono text-[11px] uppercase tracking-wider text-text-tertiary">Coming soon</p>
+    </div>
+  )
+}
