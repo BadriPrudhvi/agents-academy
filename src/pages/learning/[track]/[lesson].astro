@@ -8,6 +8,7 @@ import TutorPanel from "../../../components/interactive/tutor/TutorPanel.tsx";
 import LessonProgress from "../../../components/interactive/LessonProgress.tsx";
 import ViewToggle from "../../../components/interactive/ViewToggle.tsx";
 import AgentDiagram from "../../../components/interactive/AgentDiagram.tsx";
+import AgentBuilder from "../../../components/interactive/AgentBuilder.tsx";
 import AgentSim from "../../../components/interactive/AgentSim.tsx";
 import WatchItRun from "../../../components/interactive/WatchItRun.tsx";
 import LessonFeedback from "../../../components/interactive/LessonFeedback.tsx";
@@ -16,6 +17,7 @@ import { Clock, Target, ListChecks } from "@phosphor-icons/react";
 const { track: trackId, lesson: slug } = Astro.params;
 const lesson = getLesson(slug ?? "");
 const track = getTrack(trackId ?? "");
+const nextLesson = lesson?.next ? getLesson(lesson.next.slug) : undefined;
 
 if (!lesson || !track || lesson.trackId !== track.id) {
   return new Response("Lesson not found", { status: 404 });
@@ -76,7 +78,7 @@ const calloutTone: Record<string, string> = {
 
     <div class="mt-8 grid gap-10 lg:grid-cols-[1fr_16rem]">
       {/* Body */}
-      <div class="min-w-0" id="lesson-body" data-view="code">
+      <div class="min-w-0" id="lesson-body" data-view="concept">
         {/* Why it matters + outcomes */}
         <div class="mb-8 rounded-xl border border-border-100 bg-background-content p-5">
           <p class="text-sm text-foreground-200"><strong>Why this matters.</strong> {lesson.whyItMatters}</p>
@@ -141,6 +143,14 @@ const calloutTone: Record<string, string> = {
                 }))}
               />
             )}
+            {b.kind === "agentBuilder" && lesson.builders?.[b.builderId] && (
+              <AgentBuilder
+                client:visible
+                title={lesson.builders[b.builderId].title}
+                intro={lesson.builders[b.builderId].intro}
+                steps={lesson.builders[b.builderId].steps}
+              />
+            )}
             {b.kind === "codelab" && lesson.labs[b.labId] && (
               <CodeLab
                 client:visible
@@ -174,8 +184,8 @@ const calloutTone: Record<string, string> = {
         </div>
         <div class="mt-4 flex flex-wrap items-center gap-3">
           <LessonProgress client:idle slug={lesson.slug} />
-          {lesson.next && getLesson(lesson.next.slug) && (
-            <a href={`/learning/${lesson.trackId}/${lesson.next.slug}`} class="inline-flex items-center gap-2 rounded-md border border-border-100 px-4 py-2.5 text-sm hover:border-accent-100">
+          {lesson.next && nextLesson && (
+            <a href={`/learning/${nextLesson.trackId}/${nextLesson.slug}`} class="inline-flex items-center gap-2 rounded-md border border-border-100 px-4 py-2.5 text-sm hover:border-accent-100">
               Next: {lesson.next.label} →
             </a>
           )}

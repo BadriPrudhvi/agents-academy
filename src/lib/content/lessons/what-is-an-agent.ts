@@ -110,6 +110,14 @@ export const whatIsAnAgent: Lesson = {
       text: "An agent is software that remembers, decides, and acts toward a goal — using tools and data along the way.",
     },
 
+    { kind: "heading", text: "Build the agent piece by piece", id: "builder", audience: "concept" },
+    {
+      kind: "prose",
+      audience: "concept",
+      text: "Instead of starting with code, let's assemble the agent like a checklist. Each button adds one capability. Press **Run current agent** after each step to see what the agent can do now.",
+    },
+    { kind: "agentBuilder", builderId: "sales-agent", audience: "concept" },
+
     { kind: "heading", text: "Drive an agent yourself", id: "see", audience: "concept" },
     {
       kind: "prose",
@@ -131,8 +139,63 @@ export const whatIsAnAgent: Lesson = {
     { kind: "codelab", labId: "agent-demo", audience: "code" },
 
     { kind: "heading", text: "Check your understanding", id: "check" },
+    { kind: "quiz", quizId: "agent-first-step" },
+    { kind: "quiz", quizId: "do-i-need-code" },
     { kind: "quiz", quizId: "agent-vs-chatbot" },
   ],
+
+  builders: {
+    "sales-agent": {
+      id: "sales-agent",
+      title: "Build a tiny sales agent",
+      intro: "Click each capability to see how a goal becomes an agent. The code appears in parallel, but you don't need to write it.",
+      steps: [
+        {
+          id: "goal",
+          label: "Add a goal",
+          plain: "Tell the agent what outcome you want.",
+          code: `const goal = "Find the top product by revenue";`,
+          output: "Goal saved: Find the top product by revenue.\n\nThe agent knows what you want, but it cannot answer yet because it has no data.",
+        },
+        {
+          id: "tool",
+          label: "Add a data tool",
+          plain: "Give the agent a safe way to read the sales table.",
+          code: `const rows = await codemode.listSales();`,
+          output: "Tool connected: sales data loaded.\n\nRows available:\n- Widget A / NA / 25000\n- Widget A / EU / 17000\n- Gadget B / NA / 30000\n- Sprocket C / EU / 12000",
+        },
+        {
+          id: "decision",
+          label: "Add a decision step",
+          plain: "Decide how to turn rows into an answer.",
+          code: `const totals = {};
+for (const row of rows) {
+  totals[row.product] = (totals[row.product] ?? 0) + row.revenue;
+}`,
+          output: "Decision complete: group by product and add revenue.\n\nIntermediate totals:\n- Widget A: 42000\n- Gadget B: 30000\n- Sprocket C: 12000",
+        },
+        {
+          id: "action",
+          label: "Add an action",
+          plain: "Return the answer in a form someone can use.",
+          code: `const top = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+return ` + "`Top product: ${top[0]} ($${top[1]})`;",
+          output: "Top product: Widget A ($42000)\n\nNow the agent can complete the task end to end.",
+        },
+        {
+          id: "memory",
+          label: "Add memory",
+          plain: "Remember what was asked and how it was answered.",
+          code: `memory.push({
+  goal,
+  answer: "Top product: Widget A ($42000)",
+  usedTool: "codemode.listSales()",
+});`,
+          output: "Memory saved.\n\nThe next time someone asks about this sales table, the agent can explain what it did and what data it used.",
+        },
+      ],
+    },
+  },
 
   labs: {
     "agent-demo": {
@@ -217,6 +280,32 @@ export const whatIsAnAgent: Lesson = {
   },
 
   quizzes: {
+    "agent-first-step": {
+      id: "agent-first-step",
+      question: "For a data question, what should the agent usually do before answering?",
+      options: [
+        "Guess from common business patterns",
+        "Fetch or inspect the relevant data",
+        "Ask for a larger model",
+        "Skip the data if the question sounds simple",
+      ],
+      answerIndex: 1,
+      explanation:
+        "For data work, the agent should ground the answer in the actual data before computing or responding. Guessing is what we are trying to avoid.",
+    },
+    "do-i-need-code": {
+      id: "do-i-need-code",
+      question: "Do you need to write code to understand what this agent is doing?",
+      options: [
+        "No. You can understand the goal, tool, decision, and answer first; code view is optional.",
+        "Yes. Agents only make sense if you can write TypeScript.",
+        "Yes. Agents cannot work with business data.",
+        "No, because agents do not use tools.",
+      ],
+      answerIndex: 0,
+      explanation:
+        "For analysts and finance users, the concept view is enough to understand the workflow. Code view exists for people who want to inspect or build the implementation.",
+    },
     "agent-vs-chatbot": {
       id: "agent-vs-chatbot",
       question: "What best separates an agent from a chatbot?",

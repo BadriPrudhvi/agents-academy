@@ -43,6 +43,7 @@ export type Block = ({ audience?: Audience }) & (
   | { kind: "analogy"; role: string; text: string } // role-tailored framing
   | { kind: "watch"; labId: string; caption?: string } // no-code "see it run" (runs the solution)
   | { kind: "agentSim"; simId: string } // no-code interactive: drive an agent, watch the loop
+  | { kind: "agentBuilder"; builderId: string } // no-code builder: add capabilities one by one
   | { kind: "codelab"; labId: string } // anchors the interactive island
   | { kind: "quiz"; quizId: string }
 );
@@ -74,6 +75,24 @@ export interface AgentSim {
   goals: AgentSimGoal[];
   /** Ask the learner to predict the first step before running (active learning). */
   predict?: boolean;
+}
+
+/* ── Agent Builder: click-to-add capabilities and see code + behavior grow ── */
+export interface AgentBuilderStep {
+  id: string;
+  label: string;
+  plain: string;
+  /** Code snippet unlocked by this step. Displayed as generated code. */
+  code: string;
+  /** What Run should show after this step is included. */
+  output: string;
+}
+
+export interface AgentBuilder {
+  id: string;
+  title: string;
+  intro: string;
+  steps: AgentBuilderStep[];
 }
 
 export type CodeLanguage = "typescript" | "javascript" | "python" | "json" | "jsonc" | "toml";
@@ -151,6 +170,7 @@ export interface Lesson {
   labs: Record<string, InteractiveLab>;
   quizzes: Record<string, RetrievalQuiz>;
   sims?: Record<string, AgentSim>;
+  builders?: Record<string, AgentBuilder>;
 
   recap: string[];
   next?: { slug: string; label: string };

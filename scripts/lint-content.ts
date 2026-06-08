@@ -37,6 +37,7 @@ async function lintLesson(l: Lesson) {
     if (b.kind === "codelab" && !l.labs[b.labId]) fail(l.slug, `codelab references missing lab '${b.labId}'`);
     if (b.kind === "watch" && !l.labs[b.labId]) fail(l.slug, `watch references missing lab '${b.labId}'`);
     if (b.kind === "agentSim" && !l.sims?.[b.simId]) fail(l.slug, `agentSim references missing sim '${b.simId}'`);
+    if (b.kind === "agentBuilder" && !l.builders?.[b.builderId]) fail(l.slug, `agentBuilder references missing builder '${b.builderId}'`);
     if (b.kind === "quiz" && !l.quizzes[b.quizId]) fail(l.slug, `quiz references missing quiz '${b.quizId}'`);
   }
 
@@ -52,6 +53,19 @@ async function lintLesson(l: Lesson) {
       if (!goal.expectedAnswer.trim()) fail(l.slug, `sim '${sim.id}' goal '${goal.id}' missing expectedAnswer`);
       if (goal.steps.length < 3) fail(l.slug, `sim '${sim.id}' goal '${goal.id}' needs at least 3 steps`);
       if (!goal.chatbotGuess.trim()) fail(l.slug, `sim '${sim.id}' goal '${goal.id}' missing chatbotGuess`);
+    }
+  }
+
+  // ── AgentBuilder integrity (no-code-to-code bridge) ──
+  for (const builder of Object.values(l.builders ?? {})) {
+    if (!builder.title.trim()) fail(l.slug, `builder '${builder.id}' missing title`);
+    if (!builder.intro.trim()) fail(l.slug, `builder '${builder.id}' missing intro`);
+    if (builder.steps.length < 4) fail(l.slug, `builder '${builder.id}' needs at least 4 steps`);
+    for (const step of builder.steps) {
+      if (!step.label.trim()) fail(l.slug, `builder '${builder.id}' step '${step.id}' missing label`);
+      if (!step.plain.trim()) fail(l.slug, `builder '${builder.id}' step '${step.id}' missing plain-language explanation`);
+      if (!step.code.trim()) fail(l.slug, `builder '${builder.id}' step '${step.id}' missing code`);
+      if (!step.output.trim()) fail(l.slug, `builder '${builder.id}' step '${step.id}' missing run output`);
     }
   }
 

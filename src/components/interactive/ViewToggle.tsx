@@ -15,7 +15,7 @@ interface Props {
 }
 
 export default function ViewToggle({ targetId }: Props) {
-  const [view, setView] = useState<View>("code");
+  const [view, setView] = useState<View>("concept");
 
   useEffect(() => {
     let initial: View | undefined;
@@ -23,7 +23,7 @@ export default function ViewToggle({ targetId }: Props) {
       initial = (localStorage.getItem(VIEW_KEY) as View) || undefined;
       if (!initial) initial = getRoleById(localStorage.getItem(ROLE_KEY))?.defaultView;
     } catch {}
-    apply(initial ?? "code");
+    apply(initial ?? "concept");
 
     // If the learner picks a role and hasn't chosen a view explicitly, follow it.
     const onRole = (e: Event) => {
