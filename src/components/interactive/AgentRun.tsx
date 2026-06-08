@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { Brain, CaretRight, CheckCircle, Code, Cpu, Eye, Flag, Spinner, Wrench } from "@phosphor-icons/react";
+import type { AgentStep as Step } from "@/lib/content/agent-trace";
 
 interface Tool {
   name: string;
@@ -14,13 +15,6 @@ interface Props {
   tools: Tool[];
   examples: string[];
 }
-
-type Step =
-  | { type: "goal"; text: string }
-  | { type: "think"; text: string }
-  | { type: "tool"; name: string; args: unknown }
-  | { type: "observe"; text: string; data?: unknown }
-  | { type: "answer"; text: string };
 
 const STEP_META: Record<Step["type"], { icon: typeof Brain; label: string; tone: string }> = {
   goal: { icon: Flag, label: "Goal", tone: "var(--color-foreground-300)" },

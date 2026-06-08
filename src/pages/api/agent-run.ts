@@ -1,6 +1,9 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 import { getLesson } from "@/lib/content";
+import { json } from "@/lib/api/http";
+import { getEnv, parseBody } from "@/lib/api/context";
+import type { AgentStep as Step } from "@/lib/content/agent-trace";
 
 export const prerender = false;
 
@@ -82,26 +85,15 @@ function safeParse(s: unknown): unknown {
   }
 }
 
-type Step =
-  | { type: "goal"; text: string }
-  | { type: "think"; text: string }
-  | { type: "tool"; name: string; args: unknown }
-  | { type: "observe"; text: string; data?: unknown }
-  | { type: "answer"; text: string };
-
 export const POST: APIRoute = async ({ request, locals }) => {
-  let parsed;
-  try {
-    parsed = Body.parse(await request.json());
-  } catch (err) {
-    return json({ error: "Invalid request", detail: String(err) }, 400);
-  }
+  const parsed = await parseBody(request, Body);
+  if (parsed instanceof Response) return parsed;
 
   const lesson = getLesson(parsed.lessonSlug);
   const run = lesson?.agentRuns?.[parsed.runId];
   if (!lesson || !run) return json({ error: "Unknown agent run" }, 404);
 
-  const env = (locals as any)?.runtime?.env;
+  const env = getEnv(locals);
   if (!env?.AI) return json({ error: "The live agent runs in the deployed environment." }, 503);
 
   const messages: any[] = [
@@ -177,7 +169,3 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return json({ error: `Agent run failed: ${String(err)}` }, 200);
   }
 };
-
-function json(data: unknown, status: number): Response {
-  return new Response(JSON.stringify(data), { status, headers: { "content-type": "application/json" } });
-}

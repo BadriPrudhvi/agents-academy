@@ -2,6 +2,8 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import { getLesson } from "@/lib/content";
 import { deniedJs, stripFences } from "@/lib/guard";
+import { json } from "@/lib/api/http";
+import { getEnv, parseBody } from "@/lib/api/context";
 
 export const prerender = false;
 
@@ -21,18 +23,14 @@ const MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
  * reaches the editor.
  */
 export const POST: APIRoute = async ({ request, locals }) => {
-  let parsed;
-  try {
-    parsed = Body.parse(await request.json());
-  } catch (err) {
-    return json({ error: "Invalid request", detail: String(err) }, 400);
-  }
+  const parsed = await parseBody(request, Body);
+  if (parsed instanceof Response) return parsed;
 
   const lesson = getLesson(parsed.lessonSlug);
   const studio = lesson?.studios?.[parsed.studioId];
   if (!lesson || !studio) return json({ error: "Unknown studio" }, 404);
 
-  const env = (locals as any)?.runtime?.env;
+  const env = getEnv(locals);
   if (!env?.AI) {
     return json({ error: "AI code generation is available in the deployed environment." }, 503);
   }
@@ -79,7 +77,3 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return json({ error: `Code generation failed: ${String(err)}` }, 200);
   }
 };
-
-function json(data: unknown, status: number): Response {
-  return new Response(JSON.stringify(data), { status, headers: { "content-type": "application/json" } });
-}

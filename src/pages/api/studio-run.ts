@@ -3,6 +3,8 @@ import { z } from "zod";
 import { getLesson } from "@/lib/content";
 import { getRunner } from "@/lib/runner";
 import { deniedJs } from "@/lib/guard";
+import { json } from "@/lib/api/http";
+import { getEnv, parseBody } from "@/lib/api/context";
 
 export const prerender = false;
 
@@ -19,12 +21,8 @@ const Body = z.object({
  * (per-session container, exec timeout, denylist).
  */
 export const POST: APIRoute = async ({ request, locals }) => {
-  let parsed;
-  try {
-    parsed = Body.parse(await request.json());
-  } catch (err) {
-    return json({ error: "Invalid request", detail: String(err) }, 400);
-  }
+  const parsed = await parseBody(request, Body);
+  if (parsed instanceof Response) return parsed;
 
   const lesson = getLesson(parsed.lessonSlug);
   const studio = lesson?.studios?.[parsed.studioId];
@@ -33,7 +31,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const blocked = deniedJs(parsed.code);
   if (blocked) return json({ ok: false, engine: "sandbox", output: blocked, blocked: true }, 200);
 
-  const env = (locals as any)?.runtime?.env;
+  const env = getEnv(locals);
   const mode = env?.RUNNER_MODE as string | undefined;
   if (mode !== "sandbox" || !env?.RUNNER) {
     return json(
@@ -59,7 +57,3 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return json({ ok: false, engine: "sandbox", output: String(err) }, 200);
   }
 };
-
-function json(data: unknown, status: number): Response {
-  return new Response(JSON.stringify(data), { status, headers: { "content-type": "application/json" } });
-}

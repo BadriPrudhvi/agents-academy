@@ -2,6 +2,8 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import { getLesson } from "@/lib/content";
 import { getRunner } from "@/lib/runner";
+import { json } from "@/lib/api/http";
+import { getEnv, parseBody } from "@/lib/api/context";
 
 export const prerender = false;
 
@@ -17,12 +19,8 @@ const Body = z.object({
 });
 
 export const POST: APIRoute = async ({ request, locals }) => {
-  let parsed;
-  try {
-    parsed = Body.parse(await request.json());
-  } catch (err) {
-    return json({ error: "Invalid request", detail: String(err) }, 400);
-  }
+  const parsed = await parseBody(request, Body);
+  if (parsed instanceof Response) return parsed;
 
   const lesson = getLesson(parsed.lessonSlug);
   const lab = lesson?.labs[parsed.labId];
@@ -31,7 +29,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 
   // Hidden checks come from the server-side content, never from the client.
-  const env = (locals as any)?.runtime?.env;
+  const env = getEnv(locals);
   const runner = getRunner(env?.RUNNER_MODE as string | undefined, env?.RUNNER);
 
   // "demo" runs the reference solution server-side (no learner code needed).
@@ -56,10 +54,3 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   return json(result, 200);
 };
-
-function json(data: unknown, status: number): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { "content-type": "application/json" },
-  });
-}

@@ -1,5 +1,7 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
+import { json } from "@/lib/api/http";
+import { getEnv, parseBody } from "@/lib/api/context";
 
 export const prerender = false;
 
@@ -15,17 +17,10 @@ const Body = z.object({
  * else logs (visible in `wrangler tail`). Swap-point: persist to D1 for trends.
  */
 export const POST: APIRoute = async ({ request, locals }) => {
-  let body;
-  try {
-    body = Body.parse(await request.json());
-  } catch (err) {
-    return new Response(JSON.stringify({ error: "Invalid request", detail: String(err) }), {
-      status: 400,
-      headers: { "content-type": "application/json" },
-    });
-  }
+  const body = await parseBody(request, Body);
+  if (body instanceof Response) return body;
 
-  const env = (locals as any)?.runtime?.env;
+  const env = getEnv(locals);
   try {
     if (env?.FEEDBACK) {
       env.FEEDBACK.writeDataPoint({
@@ -40,8 +35,5 @@ export const POST: APIRoute = async ({ request, locals }) => {
     console.error("[feedback] failed:", err);
   }
 
-  return new Response(JSON.stringify({ ok: true }), {
-    status: 200,
-    headers: { "content-type": "application/json" },
-  });
+  return json({ ok: true }, 200);
 };
