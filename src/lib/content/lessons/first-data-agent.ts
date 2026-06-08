@@ -41,6 +41,7 @@ export const firstDataAgent: Lesson = {
   title: "Build a data agent that runs Python",
   summary:
     "Give an agent a Sandbox and it can run real Python to analyze data — averages, ranking, forecasts — then report back.",
+  bigIdea: "Let the agent **compute** — run real Python, don't guess the numbers.",
 
   outcomes: [
     "Explain how an agent runs Python safely in a Sandbox.",
@@ -69,7 +70,18 @@ export const firstDataAgent: Lesson = {
     { kind: "heading", text: "Let the agent compute", id: "idea" },
     {
       kind: "prose",
-      text: "Language models are great at *planning* and terrible at *arithmetic*. The fix: give the agent a **Sandbox** — an isolated container — and let it run real **Python**. It writes code, the Sandbox runs it, and the agent reports the actual result.",
+      text: "Models plan well but do arithmetic badly. Give the agent a **Sandbox** — an isolated container — and let it run real Python. It writes code, the Sandbox runs it, and the agent reports the actual result.",
+    },
+    {
+      kind: "compare",
+      left: {
+        title: "Model does the math",
+        items: ["Approximates arithmetic", "Hallucinates totals", "Not reproducible"],
+      },
+      right: {
+        title: "Sandbox runs Python",
+        items: ["Exact results", "Computed from the source rows", "Re-runnable"],
+      },
     },
     {
       kind: "diagram",
@@ -86,23 +98,12 @@ export const firstDataAgent: Lesson = {
         { from: "box", to: "out", label: "real numbers" },
       ],
     },
+    { kind: "statement", text: "Real numbers, not **vibes**.", sub: "If an agent reports a total without running code, be suspicious." },
     {
       kind: "analogy",
       role: "Finance",
       audience: "concept",
-      text: "Instead of trusting a 'best guess' total, the agent opens a calculator that shows its work — every figure is computed from the source rows and you can re-run it.",
-    },
-    {
-      kind: "analogy",
-      role: "Data analyst",
-      audience: "concept",
-      text: "Like asking a colleague who actually opens the data and runs the numbers, then hands you the answer — rather than estimating from memory.",
-    },
-    {
-      kind: "callout",
-      tone: "warning",
-      title: "Real numbers, not vibes",
-      text: "If an agent reports a total without running code, treat it with suspicion. Computation belongs in the Sandbox.",
+      text: "Instead of a 'best guess' total, the agent opens a calculator that shows its work — every figure computed from the source rows, and you can re-run it.",
     },
 
     { kind: "heading", text: "What the analysis does", id: "does", audience: "concept" },
@@ -125,14 +126,14 @@ export const firstDataAgent: Lesson = {
     {
       kind: "prose",
       audience: "concept",
-      text: "Switch to **Code** view to write the Python — or just read it; it's four lines of analysis.",
+      text: "Switch to **Code** to write the Python — or just read it; four lines.",
     },
 
     { kind: "heading", text: "Write the analysis", id: "build", audience: "code" },
     {
       kind: "prose",
       audience: "code",
-      text: "Complete the three TODOs so the script prints the average revenue and the top month. Press **Run** to execute it in the Sandbox, then **Check**.",
+      text: "Complete the three TODOs to print the average revenue and the top month. **Run** it in the Sandbox, then **Check**.",
     },
     { kind: "codelab", labId: "python-summary", audience: "code" },
     {
