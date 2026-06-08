@@ -8,6 +8,7 @@ import TutorPanel from "../../../components/interactive/tutor/TutorPanel.tsx";
 import LessonProgress from "../../../components/interactive/LessonProgress.tsx";
 import ViewToggle from "../../../components/interactive/ViewToggle.tsx";
 import AgentDiagram from "../../../components/interactive/AgentDiagram.tsx";
+import AgentSim from "../../../components/interactive/AgentSim.tsx";
 import WatchItRun from "../../../components/interactive/WatchItRun.tsx";
 import LessonFeedback from "../../../components/interactive/LessonFeedback.tsx";
 import { Clock, Target, ListChecks } from "@phosphor-icons/react";
@@ -121,6 +122,24 @@ const calloutTone: Record<string, string> = {
             )}
             {b.kind === "watch" && lesson.labs[b.labId] && (
               <WatchItRun client:visible lessonSlug={lesson.slug} labId={b.labId} caption={b.caption} />
+            )}
+            {b.kind === "agentSim" && lesson.sims?.[b.simId] && (
+              <AgentSim
+                client:visible
+                lessonSlug={lesson.slug}
+                simId={lesson.sims[b.simId].id}
+                toolName={lesson.sims[b.simId].toolName}
+                toolPreview={lesson.sims[b.simId].toolPreview}
+                predict={lesson.sims[b.simId].predict}
+                goals={lesson.sims[b.simId].goals.map((g) => ({
+                  id: g.id,
+                  label: g.label,
+                  toolName: g.toolName,
+                  steps: g.steps,
+                  chatbotGuess: g.chatbotGuess,
+                  expectedAnswer: g.expectedAnswer,
+                }))}
+              />
             )}
             {b.kind === "codelab" && lesson.labs[b.labId] && (
               <CodeLab

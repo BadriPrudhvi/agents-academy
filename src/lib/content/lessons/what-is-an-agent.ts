@@ -23,6 +23,22 @@ const solution = `export default async function () {
   console.log(\`Top product: \${top[0]} ($\${top[1]})\`);
 }`;
 
+const topRegionProgram = `export default async function () {
+  const rows = await codemode.listSales();
+  const totals = {};
+  for (const r of rows) {
+    totals[r.region] = (totals[r.region] ?? 0) + r.revenue;
+  }
+  const top = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  console.log(\`Top region: \${top[0]} ($\${top[1]})\`);
+}`;
+
+const totalRevenueProgram = `export default async function () {
+  const rows = await codemode.listSales();
+  const total = rows.reduce((sum, r) => sum + r.revenue, 0);
+  console.log(\`Total revenue: $\${total}\`);
+}`;
+
 export const whatIsAnAgent: Lesson = {
   slug: "what-is-an-agent",
   trackId: "foundations",
@@ -94,17 +110,16 @@ export const whatIsAnAgent: Lesson = {
       text: "An agent is software that remembers, decides, and acts toward a goal — using tools and data along the way.",
     },
 
-    { kind: "heading", text: "See one work", id: "see", audience: "concept" },
+    { kind: "heading", text: "Drive an agent yourself", id: "see", audience: "concept" },
     {
       kind: "prose",
       audience: "concept",
-      text: "Here's a tiny agent task: read a small sales table and report the top product by revenue. You don't write anything — press the button and watch it run.",
+      text: "Now you choose the goal. The agent will read real data, decide what to compute, and show the answer. You don't write code — you steer the task and watch the loop.",
     },
     {
-      kind: "watch",
+      kind: "agentSim",
       audience: "concept",
-      labId: "agent-demo",
-      caption: "The agent reads the sales data, adds up revenue per product, and reports the winner.",
+      simId: "sales",
     },
 
     { kind: "heading", text: "Try it yourself", id: "try", audience: "code" },
@@ -134,6 +149,70 @@ export const whatIsAnAgent: Lesson = {
         ],
         solutionHint: solution,
       },
+    },
+  },
+
+  sims: {
+    sales: {
+      id: "sales",
+      toolName: "codemode.listSales()",
+      predict: true,
+      toolPreview: {
+        columns: ["product", "region", "revenue"],
+        rows: [
+          ["Widget A", "NA", 25000],
+          ["Widget A", "EU", 17000],
+          ["Gadget B", "NA", 30000],
+          ["Sprocket C", "EU", 12000],
+        ],
+      },
+      goals: [
+        {
+          id: "top-product",
+          label: "Find the top product by revenue",
+          toolName: "codemode.listSales()",
+          program: solution,
+          steps: [
+            "Read the goal: find the product with the most revenue.",
+            "Decide the needed tool: sales rows.",
+            "Call codemode.listSales() to get the table.",
+            "Add revenue for each product.",
+            "Return the highest product and its total.",
+          ],
+          chatbotGuess: "Widget A is probably popular, so it might be the top product.",
+          expectedAnswer: "Top product: Widget A ($42000)",
+        },
+        {
+          id: "top-region",
+          label: "Find the top region by revenue",
+          toolName: "codemode.listSales()",
+          program: topRegionProgram,
+          steps: [
+            "Read the goal: find which region sold the most.",
+            "Decide the needed tool: sales rows grouped by region.",
+            "Call codemode.listSales() to get the table.",
+            "Add revenue for each region.",
+            "Return the highest region and its total.",
+          ],
+          chatbotGuess: "EU is a large market, so it may be the top region.",
+          expectedAnswer: "Top region: NA ($55000)",
+        },
+        {
+          id: "total-revenue",
+          label: "Calculate total revenue",
+          toolName: "codemode.listSales()",
+          program: totalRevenueProgram,
+          steps: [
+            "Read the goal: calculate total revenue.",
+            "Decide the needed tool: all sales rows.",
+            "Call codemode.listSales() to get the table.",
+            "Add every revenue value together.",
+            "Return the final total.",
+          ],
+          chatbotGuess: "The total is likely around $75,000 based on the table size.",
+          expectedAnswer: "Total revenue: $84000",
+        },
+      ],
     },
   },
 

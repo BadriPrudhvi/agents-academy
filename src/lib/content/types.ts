@@ -42,9 +42,39 @@ export type Block = ({ audience?: Audience }) & (
   | { kind: "diagram"; title?: string; nodes: DiagramNode[]; edges: DiagramEdge[] }
   | { kind: "analogy"; role: string; text: string } // role-tailored framing
   | { kind: "watch"; labId: string; caption?: string } // no-code "see it run" (runs the solution)
+  | { kind: "agentSim"; simId: string } // no-code interactive: drive an agent, watch the loop
   | { kind: "codelab"; labId: string } // anchors the interactive island
   | { kind: "quiz"; quizId: string }
 );
+
+/* ── Agent Playground: a no-code interactive that makes the agent loop tangible ── */
+
+export interface AgentSimGoal {
+  id: string;
+  /** What the learner asks the agent to do. */
+  label: string;
+  /** Tool the agent calls for this goal (display only). */
+  toolName: string;
+  /** Server-only JS program (uses codemode.*); executed by the runner. Never sent to the client. */
+  program: string;
+  /** Scripted "how the agent is thinking" steps (labeled as illustration). */
+  steps: string[];
+  /** Illustrative ungrounded chatbot answer, for the contrast. */
+  chatbotGuess: string;
+  /** Known correct answer — shown in mock dev and used as a fallback. */
+  expectedAnswer: string;
+}
+
+export interface AgentSim {
+  id: string;
+  /** The tool the agent has access to (display). */
+  toolName: string;
+  /** The data the tool returns — shown so the learner sees what the agent read. */
+  toolPreview: { columns: string[]; rows: (string | number)[][] };
+  goals: AgentSimGoal[];
+  /** Ask the learner to predict the first step before running (active learning). */
+  predict?: boolean;
+}
 
 export type CodeLanguage = "typescript" | "javascript" | "python" | "json" | "jsonc" | "toml";
 
@@ -120,6 +150,7 @@ export interface Lesson {
   blocks: Block[];
   labs: Record<string, InteractiveLab>;
   quizzes: Record<string, RetrievalQuiz>;
+  sims?: Record<string, AgentSim>;
 
   recap: string[];
   next?: { slug: string; label: string };

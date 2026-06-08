@@ -36,7 +36,23 @@ async function lintLesson(l: Lesson) {
   for (const b of l.blocks) {
     if (b.kind === "codelab" && !l.labs[b.labId]) fail(l.slug, `codelab references missing lab '${b.labId}'`);
     if (b.kind === "watch" && !l.labs[b.labId]) fail(l.slug, `watch references missing lab '${b.labId}'`);
+    if (b.kind === "agentSim" && !l.sims?.[b.simId]) fail(l.slug, `agentSim references missing sim '${b.simId}'`);
     if (b.kind === "quiz" && !l.quizzes[b.quizId]) fail(l.slug, `quiz references missing quiz '${b.quizId}'`);
+  }
+
+  // ── AgentSim integrity (no-code interactive) ──
+  for (const sim of Object.values(l.sims ?? {})) {
+    if (!sim.toolName.trim()) fail(l.slug, `sim '${sim.id}' missing toolName`);
+    if (sim.toolPreview.columns.length < 1 || sim.toolPreview.rows.length < 1) {
+      fail(l.slug, `sim '${sim.id}' needs a visible toolPreview table`);
+    }
+    if (sim.goals.length < 1) fail(l.slug, `sim '${sim.id}' needs at least one goal`);
+    for (const goal of sim.goals) {
+      if (!goal.program.trim()) fail(l.slug, `sim '${sim.id}' goal '${goal.id}' missing server-side program`);
+      if (!goal.expectedAnswer.trim()) fail(l.slug, `sim '${sim.id}' goal '${goal.id}' missing expectedAnswer`);
+      if (goal.steps.length < 3) fail(l.slug, `sim '${sim.id}' goal '${goal.id}' needs at least 3 steps`);
+      if (!goal.chatbotGuess.trim()) fail(l.slug, `sim '${sim.id}' goal '${goal.id}' missing chatbotGuess`);
+    }
   }
 
   // ── Quiz integrity ──
