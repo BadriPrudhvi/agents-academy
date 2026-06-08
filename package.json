@@ -10,6 +10,8 @@
     "preview": "pnpm build && wrangler dev",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint:content": "tsx scripts/lint-content.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "deploy:staging": "astro build && wrangler deploy --env staging",
     "deploy:production": "astro build && wrangler deploy --env production"
   },
@@ -20,9 +22,7 @@
     "@monaco-editor/react": "^4.6.0",
     "@phosphor-icons/react": "^2.1.7",
     "@tailwindcss/vite": "^4.1.11",
-    "@xyflow/react": "^12.3.0",
     "astro": "^5.13.0",
-    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "motion": "^11.11.0",
     "react": "^19.1.0",
@@ -34,10 +34,15 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250726.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "jsdom": "^29.1.1",
     "tsx": "^4.19.0",
     "typescript": "^5.7.0",
+    "vitest": "^2",
     "wrangler": "^4.20.0"
   },
   "packageManager": "pnpm@9.15.9"

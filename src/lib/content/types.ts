@@ -17,7 +17,7 @@
  */
 export type Audience = "concept" | "code";
 
-/** Simple agent-architecture diagram node/edge (rendered with @xyflow/react). */
+/** Simple agent-architecture diagram node/edge (rendered as a static SVG). */
 export interface DiagramNode {
   id: string;
   label: string;
