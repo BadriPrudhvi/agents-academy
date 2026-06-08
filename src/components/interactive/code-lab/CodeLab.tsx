@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion } from "motion/react";
 import Editor from "@monaco-editor/react";
 import { Play, CheckCircle, XCircle, Eye, Spinner, Terminal } from "@phosphor-icons/react";
+import { useMonacoTheme } from "@/components/ui/useMonacoTheme";
+import { MONACO_BASE_OPTIONS, MonacoLoading } from "@/components/ui/monaco";
+import { OutputConsole } from "@/components/ui/OutputConsole";
 
 const MONACO_LANG: Record<string, string> = {
   typescript: "typescript",
@@ -55,15 +58,7 @@ export default function CodeLab(props: Props) {
   const [grade, setGrade] = useState<GradeCheck[] | null>(null);
   const [passed, setPassed] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
-  const [theme, setTheme] = useState<"light" | "vs-dark">("light");
-
-  useEffect(() => {
-    const sync = () => setTheme(document.documentElement.classList.contains("dark") ? "vs-dark" : "light");
-    sync();
-    const obs = new MutationObserver(sync);
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => obs.disconnect();
-  }, []);
+  const theme = useMonacoTheme();
 
   const file = files[active];
   const editorHeight = Math.min(440, Math.max(160, file.contents.split("\n").length * 19 + 24));
@@ -139,18 +134,10 @@ export default function CodeLab(props: Props) {
           value={file.contents}
           theme={theme}
           onChange={(v) => update(v ?? "")}
-          loading={<div className="p-4 font-mono text-xs text-text-secondary">Loading editor…</div>}
+          loading={MonacoLoading}
           options={{
+            ...MONACO_BASE_OPTIONS,
             readOnly: file.readOnly,
-            minimap: { enabled: false },
-            fontSize: 13,
-            lineNumbers: "on",
-            scrollBeyondLastLine: false,
-            tabSize: 2,
-            padding: { top: 12, bottom: 12 },
-            fontFamily: "var(--font-mono)",
-            renderLineHighlight: "none",
-            overviewRulerLanes: 0,
             scrollbar: { vertical: "auto", alwaysConsumeMouseWheel: false },
           }}
         />
@@ -189,9 +176,7 @@ export default function CodeLab(props: Props) {
             <Terminal size={13} /> Output
             {engine === "mock" && <span className="ml-2 rounded bg-background-300 px-1.5 py-0.5 normal-case tracking-normal">simulated</span>}
           </div>
-          <pre className="overflow-x-auto bg-[#151414] px-4 py-3 font-mono text-[12.5px] leading-relaxed text-[#f0e3de]">
-            {output}
-          </pre>
+          <OutputConsole rounded={false}>{output}</OutputConsole>
         </div>
       )}
 

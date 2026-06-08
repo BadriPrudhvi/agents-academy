@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { Play, Spinner, Sparkle } from "@phosphor-icons/react";
+import { OutputConsole } from "@/components/ui/OutputConsole";
 
 /**
  * No-code "see it in action": runs the lesson's reference solution server-side
@@ -55,9 +56,7 @@ export default function WatchItRun({ lessonSlug, labId, caption }: Props) {
       {output && (
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="mt-4">
           <p className="mb-1 text-[11px] uppercase tracking-wider text-text-secondary">What the agent produced</p>
-          <pre className="overflow-x-auto rounded-lg bg-[#151414] px-4 py-3 font-mono text-[12.5px] leading-relaxed text-[#f0e3de]">
-            {output}
-          </pre>
+          <OutputConsole>{output}</OutputConsole>
         </motion.div>
       )}
     </div>

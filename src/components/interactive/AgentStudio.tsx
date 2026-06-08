@@ -1,7 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Editor from "@monaco-editor/react";
 import { motion } from "motion/react";
 import { ArrowCounterClockwise, MagicWand, Play, Plus, Spinner, Table } from "@phosphor-icons/react";
+import { useMonacoTheme } from "@/components/ui/useMonacoTheme";
+import { MONACO_BASE_OPTIONS, MonacoLoading } from "@/components/ui/monaco";
+import { OutputConsole } from "@/components/ui/OutputConsole";
 
 interface Capability {
   id: string;
@@ -45,7 +48,7 @@ const short = (label: string) => label.replace(/^Find the /, "").replace(/^Calcu
 
 export default function AgentStudio(props: Props) {
   const [code, setCode] = useState(props.starterProgram);
-  const [theme, setTheme] = useState<"light" | "vs-dark">("light");
+  const theme = useMonacoTheme();
   const [running, setRunning] = useState(false);
   const [output, setOutput] = useState<string | null>(null);
   const [engine, setEngine] = useState<"mock" | "sandbox" | null>(null);
@@ -55,14 +58,6 @@ export default function AgentStudio(props: Props) {
   const [aiError, setAiError] = useState<string | null>(null);
   const [showSteps, setShowSteps] = useState(false);
   const [showData, setShowData] = useState(false);
-
-  useEffect(() => {
-    const sync = () => setTheme(document.documentElement.classList.contains("dark") ? "vs-dark" : "light");
-    sync();
-    const obs = new MutationObserver(sync);
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => obs.disconnect();
-  }, []);
 
   const goal = useMemo(() => props.goals.find((g) => g.id === goalId), [goalId, props.goals]);
 
@@ -215,17 +210,9 @@ export default function AgentStudio(props: Props) {
             value={code}
             theme={theme}
             onChange={(v) => setCode(v ?? "")}
-            loading={<div className="p-4 font-mono text-xs text-text-secondary">Loading editor…</div>}
+            loading={MonacoLoading}
             options={{
-              minimap: { enabled: false },
-              fontSize: 13,
-              lineNumbers: "on",
-              scrollBeyondLastLine: false,
-              tabSize: 2,
-              padding: { top: 12, bottom: 12 },
-              fontFamily: "var(--font-mono)",
-              renderLineHighlight: "none",
-              overviewRulerLanes: 0,
+              ...MONACO_BASE_OPTIONS,
               folding: false,
               scrollbar: { alwaysConsumeMouseWheel: false },
             }}
@@ -249,9 +236,7 @@ export default function AgentStudio(props: Props) {
               Output
               {engine === "sandbox" && <span className="rounded bg-ai-200 px-1.5 py-0.5 normal-case tracking-normal text-ai-100">real · Sandbox</span>}
             </p>
-            <pre className="overflow-x-auto rounded-lg bg-[#151414] px-4 py-3 font-mono text-[12.5px] leading-relaxed text-[#f0e3de]">
-              {running ? "Running in the Sandbox…" : output}
-            </pre>
+            <OutputConsole>{running ? "Running in the Sandbox…" : output}</OutputConsole>
             {goal?.chatbotGuess && !running && (
               <p className="mt-2 text-xs text-text-secondary">
                 A chatbot would have guessed: “{goal.chatbotGuess}” — your agent computed the real answer above.
